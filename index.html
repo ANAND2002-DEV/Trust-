@@ -209,7 +209,6 @@
             margin-top: 5px;
         }
 
-        /* Corner Controls */
         .corner-btn {
             position: fixed;
             bottom: 20px;
@@ -241,7 +240,6 @@
             color: rgba(233, 213, 255, 0.18);
         }
 
-        /* Admin Modal Styling */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -301,48 +299,7 @@
             border-color: #c084fc;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 11px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: var(--btn-grad);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #271947;
-            color: #d8b4fe;
-        }
-
-        .error-msg {
-            color: #fda4af;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-            display: none;
-            text-align: center;
-        }
-
-        @media (min-width: 768px) {
-            .heart-stage { width: 330px; height: 300px; }
-            .heart-svg { width: 295px; height: 270px; }
-            .inside-percentage { font-size: 2.2rem; }
-        }
-    </style>
-    </head>
-    <body>
+        <body>
 
     <div class="cosmic-frame"></div>
     <canvas id="sky-canvas"></canvas>
@@ -436,11 +393,11 @@
         <div class="streak-badge" id="ui-streak">Day 1 of growing together</div>
     </div>
 
-    <!-- Ambient Space Music & Admin Gear -->
-    <button id="music-toggle" class="corner-btn" title="Ambient Space Music">🔇</button>
+    <button id="music-toggle" class="corner-btn" title="Play / Mute Music">🔇</button>
+    <button id="track-switch" class="corner-btn" style="left: 64px;" title="Change Melody">🎵</button>
+    <div id="track-toast" style="position: fixed; bottom: 64px; left: 20px; z-index: 10; font-family: 'Montserrat', sans-serif; font-size: 0.72rem; letter-spacing: 1px; color: #f3e8ff; background: rgba(21, 11, 43, 0.85); border: 1px solid rgba(216, 180, 254, 0.25); padding: 6px 12px; border-radius: 20px; opacity: 0; transition: opacity 0.4s ease; pointer-events: none;"></div>
     <button id="admin-trigger" class="corner-btn" title="Settings">⚙️</button>
 
-    <!-- Admin Login & Customization Modal -->
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-box" id="login-view">
             <h3>Admin Access</h3>
@@ -469,6 +426,14 @@
                 <option value="emerald">Aurora Emerald (Teal / Green)</option>
             </select>
 
+            <label class="field-label">Default Background Melody</label>
+            <select id="music-select">
+                <option value="clair">Clair de Lune (Romantic Piano)</option>
+                <option value="moonlight">Moonlight Serenade (Emotional Piano)</option>
+                <option value="musicbox">Starlight Music Box (Chimes)</option>
+                <option value="space">Deep Cosmic Space Pad</option>
+            </select>
+
             <label class="field-label">Top Caption</label>
             <input type="text" id="edit-top-caption" placeholder="Among The Galaxies">
 
@@ -487,7 +452,7 @@
             </div>
         </div>
     </div>
-        <script>
+            <script>
         // PASTE YOUR FIREBASE DATABASE URL BELOW (No trailing slash)
         const FIREBASE_DB_URL = "PASTE_YOUR_FIREBASE_URL_HERE";
 
@@ -694,20 +659,133 @@
             requestAnimationFrame(animateSky);
         }
         animateSky();
-                    // 3. Ambient Space Synthesizer
+                // 3. Romantic Piano & Ambient Multi-Track Synthesizer
         let audioCtx = null;
         let isPlaying = false;
         let masterGain = null;
+        let melodyTimer = null;
+        let spaceNodes = [];
+        let noteStep = 0;
+
+        const TRACKS = {
+            clair: {
+                name: '🎹 Clair de Lune (Romantic Piano)',
+                tempo: 520,
+                type: 'piano',
+                notes: [
+                    [61, 65, 68], 77, 73, 68, 65, 68, 73, 77,
+                    [58, 61, 65], 73, 70, 65, 61, 65, 70, 73,
+                    [54, 61, 66], 73, 70, 66, 61, 66, 70, 73,
+                    [56, 63, 68], 75, 72, 68, 63, 68, 72, 75
+                ]
+            },
+            moonlight: {
+                name: '🎹 Moonlight Serenade (Emotional Piano)',
+                tempo: 580,
+                type: 'piano',
+                notes: [
+                    [49, 56], 61, 64, 68, 64, 68, 61, 64,
+                    [45, 52], 61, 64, 69, 64, 69, 61, 64,
+                    [40, 47], 59, 64, 68, 64, 68, 59, 64,
+                    [47, 54], 59, 63, 66, 63, 66, 59, 63
+                ]
+            },
+            musicbox: {
+                name: '✨ Starlight Music Box',
+                tempo: 460,
+                type: 'chime',
+                notes: [
+                    76, 83, 81, 79, 76, 79, 81, 83,
+                    74, 81, 79, 78, 74, 78, 79, 81,
+                    72, 79, 78, 76, 72, 76, 78, 79,
+                    71, 78, 76, 74, 71, 74, 76, 79
+                ]
+            },
+            space: {
+                name: '🌌 Deep Cosmic Space Pad',
+                type: 'pad'
+            }
+        };
+
+        const TRACK_KEYS = Object.keys(TRACKS);
+        let activeTrackKey = 'clair';
+
         const musicBtn = document.getElementById('music-toggle');
+        const trackSwitchBtn = document.getElementById('track-switch');
+        const trackToast = document.getElementById('track-toast');
+        let toastTimeout = null;
 
-        function toggleSpaceMusic() {
-            if (!audioCtx) {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext();
-                masterGain = audioCtx.createGain();
-                masterGain.gain.value = 0.001;
-                masterGain.connect(audioCtx.destination);
+        function showTrackToast(text) {
+            trackToast.innerText = text;
+            trackToast.style.opacity = '1';
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { trackToast.style.opacity = '0'; }, 2600);
+        }
 
+        function midiToFreq(m) {
+            return 440 * Math.pow(2, (m - 69) / 12);
+        }
+
+        function playPianoNote(midi, style) {
+            if (!audioCtx || !isPlaying) return;
+            const now = audioCtx.currentTime;
+            const freq = midiToFreq(midi);
+
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const filter = audioCtx.createBiquadFilter();
+            const noteGain = audioCtx.createGain();
+
+            if (style === 'chime') {
+                osc1.type = 'sine';
+                osc2.type = 'sine';
+                osc2.frequency.value = freq * 2;
+                noteGain.gain.setValueAtTime(0.0001, now);
+                noteGain.gain.linearRampToValueAtTime(0.11, now + 0.015);
+                noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+            } else {
+                osc1.type = 'triangle';
+                osc2.type = 'sine';
+                osc2.frequency.value = freq * 2;
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1100, now);
+                filter.frequency.exponentialRampToValueAtTime(340, now + 2.4);
+
+                noteGain.gain.setValueAtTime(0.0001, now);
+                noteGain.gain.linearRampToValueAtTime(0.14, now + 0.035);
+                noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+            }
+
+            osc1.frequency.value = freq;
+
+            const subGain = audioCtx.createGain();
+            subGain.gain.value = 0.25;
+
+            osc1.connect(filter);
+            osc2.connect(subGain);
+            subGain.connect(filter);
+            filter.connect(noteGain);
+            noteGain.connect(masterGain);
+
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + 2.9);
+            osc2.stop(now + 2.9);
+        }
+
+        function stopCurrentEngine() {
+            clearInterval(melodyTimer);
+            melodyTimer = null;
+            spaceNodes.forEach(n => { try { n.stop(); } catch (e) {} });
+            spaceNodes = [];
+        }
+
+        function startTrackEngine(key) {
+            stopCurrentEngine();
+            const track = TRACKS[key] || TRACKS.clair;
+
+            if (track.type === 'pad') {
                 const freqs = [146.83, 220.00, 277.18, 329.63, 440.00];
                 freqs.forEach((f, idx) => {
                     const osc = audioCtx.createOscillator();
@@ -728,26 +806,26 @@
                     oscGain.connect(masterGain);
                     osc.start();
                     lfo.start();
+                    spaceNodes.push(osc, lfo);
                 });
-            }
-
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            isPlaying = !isPlaying;
-            const now = audioCtx.currentTime;
-            if (isPlaying) {
-                masterGain.gain.cancelScheduledValues(now);
-                masterGain.gain.exponentialRampToValueAtTime(0.35, now + 1.5);
-                musicBtn.innerText = '🔊';
             } else {
-                masterGain.gain.cancelScheduledValues(now);
-                masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
-                musicBtn.innerText = '🔇';
+                noteStep = 0;
+                const triggerStep = () => {
+                    if (!isPlaying) return;
+                    const item = track.notes[noteStep % track.notes.length];
+                    if (Array.isArray(item)) {
+                        item.forEach((n, i) => setTimeout(() => playPianoNote(n, track.type), i * 45));
+                    } else {
+                        playPianoNote(item, track.type);
+                    }
+                    noteStep++;
+                };
+                triggerStep();
+                melodyTimer = setInterval(triggerStep, track.tempo);
             }
         }
-        musicBtn.addEventListener('click', toggleSpaceMusic);
 
-        // 4. Trust Meter, Milestones & Live Day Streak Logic
+                // 4. Trust Meter, Milestones & Live Day Streak Logic
         const MAX_TRUST = 1000;
         const DAILY_GROWTH = 5;
         let currentState = {
@@ -755,6 +833,7 @@
             baseDate: getTodayMidnight(),
             baseDay: 1,
             theme: 'violet',
+            defaultTrack: 'clair',
             topCaption: 'Among The Galaxies',
             bottomCaption: 'I Found You',
             streakCaption: 'Day {day} of growing together'
@@ -791,6 +870,9 @@
             const streakTemplate = currentState.streakCaption || 'Day {day} of growing together';
             document.getElementById('ui-streak').innerText = streakTemplate.replace('{day}', liveDay);
 
+            if (currentState.defaultTrack && TRACKS[currentState.defaultTrack]) {
+                activeTrackKey = currentState.defaultTrack;
+            }
             applyTheme(currentState.theme || 'violet');
         }
 
@@ -850,6 +932,7 @@
                 const daysPassed = Math.max(0, Math.floor((getTodayMidnight() - Number(currentState.baseDate)) / 86400000));
                 document.getElementById('new-percentage').value = document.getElementById('trust-value').innerText;
                 document.getElementById('theme-select').value = currentState.theme || 'violet';
+                document.getElementById('music-select').value = currentState.defaultTrack || 'clair';
                 document.getElementById('edit-top-caption').value = currentState.topCaption || 'Among The Galaxies';
                 document.getElementById('edit-bottom-caption').value = currentState.bottomCaption || 'I Found You';
                 document.getElementById('edit-day-number').value = Number(currentState.baseDay || 1) + daysPassed;
@@ -873,10 +956,16 @@
                 baseDate: getTodayMidnight(),
                 baseDay: isNaN(dayVal) || dayVal < 1 ? 1 : dayVal,
                 theme: document.getElementById('theme-select').value,
+                defaultTrack: document.getElementById('music-select').value,
                 topCaption: document.getElementById('edit-top-caption').value.trim() || 'Among The Galaxies',
                 bottomCaption: document.getElementById('edit-bottom-caption').value.trim() || 'I Found You',
                 streakCaption: document.getElementById('edit-streak-caption').value.trim() || 'Day {day} of growing together'
             };
+
+            if (isPlaying) {
+                startTrackEngine(currentState.defaultTrack);
+                showTrackToast(TRACKS[currentState.defaultTrack].name);
+            }
 
             if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("PASTE_YOUR")) {
                 localStorage.setItem('trust_cosmic_state', JSON.stringify(currentState));
@@ -913,3 +1002,4 @@
     </script>
 </body>
 </html>
+        
