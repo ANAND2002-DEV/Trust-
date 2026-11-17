@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Among The Galaxies - Trust Meter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-center: #2a1454;
+            --bg-mid: #130926;
+            --accent-glow: rgba(168, 85, 247, 0.55);
+            --text-glow: rgba(192, 132, 252, 0.85);
+            --wave-back: rgba(139, 92, 246, 0.52);
+            --liq-top: rgba(192, 132, 252, 0.85);
+            --liq-mid: rgba(126, 34, 206, 0.88);
+            --liq-bot: rgba(59, 7, 100, 0.95);
+            --stroke-main: #e9d5ff;
+            --btn-grad: linear-gradient(135deg, #7e22ce, #a855f7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            width: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, var(--bg-center) 0%, var(--bg-mid) 48%, #06030d 100%);
+            color: #f3e8ff;
+            font-family: 'Cinzel', serif;
+            position: fixed;
+            inset: 0;
+            transition: background 1s ease;
+            touch-action: none;
+        }
+
+        .cosmic-frame {
+            position: fixed;
+            inset: 14px;
+            border: 1px solid rgba(216, 180, 254, 0.16);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        #sky-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            cursor: crosshair;
+        }
+
+        .center-anchor {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            pointer-events: none;
+            padding: 0 24px;
+        }
+
+        .top-caption, .bottom-caption {
+            font-size: 0.88rem;
+            letter-spacing: 5px;
+            color: rgba(243, 232, 255, 0.9);
+            text-transform: uppercase;
+            text-shadow: 0 0 12px var(--text-glow);
+            user-select: none;
+            text-align: center;
+            width: 100%;
+        }
+
+        .top-caption { margin-bottom: 14px; }
+        .bottom-caption { margin-top: 14px; }
+
+        .streak-badge {
+            margin-top: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: rgba(233, 213, 255, 0.72);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px 14px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .milestone-pill {
+            margin-top: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--text-glow);
+            opacity: 0.85;
+        }
+
+        .heart-stage {
+            position: relative;
+            width: 270px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floatHeart 5s ease-in-out infinite;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+
+        .orbit-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw;
+            max-width: 540px;
+            height: auto;
+            pointer-events: none;
+            z-index: 1;
+            overflow: visible;
+        }
+
+        .heart-svg {
+            position: relative;
+            width: 255px;
+            height: 235px;
+            z-index: 2;
+            overflow: visible;
+            filter: drop-shadow(0 0 22px var(--accent-glow));
+            transition: filter 0.8s ease;
+        }
+
+        .water-group {
+            transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .wave-back {
+            fill: var(--wave-back);
+            animation: waveMove 7s linear infinite;
+            transition: fill 0.8s ease;
+        }
+
+        .wave-front {
+            fill: url(#liquidGradient);
+            animation: waveMove 4.5s linear infinite reverse;
+        }
+
+        @keyframes waveMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-200px); }
+        }
+
+        .inside-meter {
+            position: absolute;
+            z-index: 4;
+            top: 47%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            width: 200px;
+        }
+
+        .inside-percentage {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 28px var(--text-glow);
+            line-height: 1.1;
+        }
+
+      .inside-max {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            color: #e9d5ff;
+            margin-top: 3px;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .inside-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(243, 232, 255, 0.85);
+            margin-top: 5px;
+        }
+
+        .corner-btn {
+            position: fixed;
+            bottom: 20px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(233, 213, 255, 0.55);
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .corner-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        #music-toggle { left: 20px; }
+        #admin-trigger {
+            right: 20px;
+            background: transparent;
+            border-color: transparent;
+            color: rgba(233, 213, 255, 0.18);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 3, 13, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            font-family: 'Montserrat', sans-serif;
+            padding: 16px;
+        }
+
+        .modal-box {
+            background: #150b2b;
+            border: 1px solid rgba(216, 180, 254, 0.25);
+            padding: 22px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 370px;
+            max-height: 88dvh;
+            overflow-y: auto;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+            text-align: left;
+        }
+
+        .modal-box h3 {
+            font-family: 'Cinzel', serif;
+            margin-bottom: 14px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: #f3e8ff;
+            text-align: center;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.72rem;
+            color: #c4b5fd;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-box input, .modal-box select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            background: #0c051a;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .modal-box input:focus, .modal-box select:focus {
+            border-color: #c084fc;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--btn-grad);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #271947;
+            color: #d8b4fe;
+        }
+
+        .error-msg {
+            color: #fda4af;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: none;
+            text-align: center;
+        }
+      @media (min-width: 768px) {
+            .heart-stage { width: 330px; height: 300px; }
+            .heart-svg { width: 295px; height: 270px; }
+            .inside-percentage { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cosmic-frame"></div>
+    <canvas id="sky-canvas"></canvas>
+
+    <div class="center-anchor">
+        <div class="top-caption" id="ui-top-caption">Among The Galaxies</div>
+
+        <div class="heart-stage">
+            <svg class="orbit-svg" viewBox="0 0 540 360">
+                <path d="M270,315 C270,315 110,205 110,105 C110,50 152,18 198,18 C230,18 256,36 270,58 C284,36 310,18 342,18 C388,18 430,50 430,105 C430,205 270,315 270,315 Z"
+                      fill="none" stroke="rgba(216, 180, 254, 0.08)" stroke-width="1" />
+                <path d="M270,335 C270,335 90,215 90,102 C90,40 138,4 190,4 C226,4 254,24 270,48 C286,24 314,4 350,4 C402,4 450,40 450,102 C450,215 270,335 270,335 Z"
+                      fill="none" stroke="rgba(216, 180, 254, 0.05)" stroke-width="1" />
+                
+                <path d="M 35,215 Q 240,320 495,125" fill="none" stroke="rgba(233, 213, 255, 0.28)" stroke-width="1" />
+                <circle cx="115" cy="246" r="2.5" fill="#ffffff" />
+                <circle cx="495" cy="125" r="3.5" fill="#ffffff" />
+                <circle cx="495" cy="125" r="9" fill="none" stroke="rgba(233, 213, 255, 0.35)" stroke-width="1" />
+            </svg>
+
+            <svg class="heart-svg" viewBox="0 0 200 185">
+                <defs>
+                    <clipPath id="heart-clip">
+                        <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" />
+                    </clipPath>
+
+                    <linearGradient id="liquidGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop id="grad-stop-1" offset="0%" stop-color="rgba(192, 132, 252, 0.85)" />
+                        <stop id="grad-stop-2" offset="55%" stop-color="rgba(126, 34, 206, 0.88)" />
+                        <stop id="grad-stop-3" offset="100%" stop-color="rgba(59, 7, 100, 0.95)" />
+                    </linearGradient>
+
+                    <radialGradient id="heartInnerGlow" cx="50%" cy="48%" r="55%">
+                        <stop offset="0%" stop-color="rgba(168, 85, 247, 0.22)" />
+                        <stop offset="100%" stop-color="rgba(19, 9, 38, 0.55)" />
+                    </radialGradient>
+
+                    <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="2.2" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+              
