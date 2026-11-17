@@ -3,93 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trust Meter</title>
+    <title>Among The Galaxies - Trust Meter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            background: radial-gradient(circle at 50% 50%, #2a1454 0%, #130926 48%, #06030d 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
+            color: #f3e8ff;
+            font-family: 'Cinzel', serif;
             position: relative;
+        }
+
+        /* Subtle Outer Frame like Reference */
+        .cosmic-frame {
+            position: fixed;
+            inset: 18px;
+            border: 1px solid rgba(216, 180, 254, 0.16);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 3;
         }
 
         /* Starry Night Sky */
         #stars-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: 0;
             pointer-events: none;
         }
 
         .star {
             position: absolute;
-            background: white;
+            background: #ffffff;
             border-radius: 50%;
+            box-shadow: 0 0 6px rgba(233, 213, 255, 0.8);
             animation: twinkle var(--duration) infinite ease-in-out;
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.2; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
+            0%, 100% { opacity: 0.15; transform: scale(0.7); }
+            50% { opacity: 0.95; transform: scale(1.2); }
         }
 
-        /* Main Content */
-        .container {
+        /* Shooting Star */
+        .shooting-star {
+            position: absolute;
+            top: 22%;
+            left: 16%;
+            width: 110px;
+            height: 1.5px;
+            background: linear-gradient(90deg, rgba(255,255,255,0), rgba(233,213,255,0.95));
+            transform: rotate(24deg);
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .shooting-star::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -2px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 18px #c084fc;
+        }
+
+        /* Main Cosmic Layout */
+        .stage {
             position: relative;
             z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 720px;
+            padding: 20px;
         }
 
-        .heart-wrapper {
+        .top-caption, .bottom-caption {
+            font-size: 0.95rem;
+            letter-spacing: 6px;
+            color: rgba(243, 232, 255, 0.85);
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+            user-select: none;
+        }
+
+        .top-caption {
+            margin-bottom: 18px;
+        }
+
+        .bottom-caption {
+            margin-top: 18px;
+        }
+
+        /* Heart & Orbit Container */
+        .heart-stage {
             position: relative;
-            width: 260px;
-            height: 240px;
-            filter: drop-shadow(0 0 25px rgba(255, 42, 109, 0.6));
-            animation: floatHeart 4s ease-in-out infinite;
+            width: 340px;
+            height: 310px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floatHeart 5s ease-in-out infinite;
         }
 
         @keyframes floatHeart {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
+            50% { transform: translateY(-8px); }
         }
 
-        svg.heart-svg {
-            width: 100%;
-            height: 100%;
+        /* Decorative Orbit Rings Behind Heart */
+        .orbit-svg {
+            position: absolute;
+            width: 540px;
+            height: 360px;
+            pointer-events: none;
+            z-index: 1;
             overflow: visible;
         }
 
-        /* Liquid Water Waves */
+        /* Main Heart SVG */
+        .heart-svg {
+            position: relative;
+            width: 300px;
+            height: 275px;
+            z-index: 2;
+            overflow: visible;
+            filter: drop-shadow(0 0 22px rgba(168, 85, 247, 0.55));
+        }
+
+        /* Liquid Water Waves Inside Heart */
         .water-group {
-            transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .wave-back {
-            fill: rgba(0, 210, 255, 0.55);
-            animation: waveMove 6s linear infinite;
+            fill: rgba(139, 92, 246, 0.52);
+            animation: waveMove 7s linear infinite;
         }
 
         .wave-front {
-            fill: rgba(58, 123, 213, 0.85);
-            animation: waveMove 4s linear infinite reverse;
+            fill: url(#liquidGradient);
+            animation: waveMove 4.5s linear infinite reverse;
         }
 
         @keyframes waveMove {
@@ -97,81 +169,95 @@
             100% { transform: translateX(-200px); }
         }
 
-        /* Meter Text */
-        .meter-info {
-            margin-top: 25px;
+        /* Meter Text Centered Inside the Heart */
+        .inside-meter {
+            position: absolute;
+            z-index: 4;
+            top: 47%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            width: 200px;
         }
 
-        .percentage-display {
-            font-size: 3rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-shadow: 0 0 15px rgba(0, 210, 255, 0.8);
+        .inside-percentage {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 28px rgba(192, 132, 252, 0.9);
+            line-height: 1.1;
         }
 
-        .percentage-display span {
-            font-size: 1.4rem;
-            color: #a0c4ff;
-            font-weight: 400;
+        .inside-max {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            color: #e9d5ff;
+            margin-top: 3px;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
         }
 
-        .label-text {
-            margin-top: 8px;
-            font-size: 1.1rem;
+        .inside-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.68rem;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: #cbd5e1;
+            color: rgba(243, 232, 255, 0.85);
+            margin-top: 6px;
         }
 
         /* Hidden Admin Trigger */
         #admin-trigger {
             position: fixed;
-            bottom: 15px;
-            right: 15px;
+            bottom: 24px;
+            right: 24px;
             z-index: 10;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 18px;
+            color: rgba(233, 213, 255, 0.16);
+            font-size: 16px;
             cursor: pointer;
             transition: color 0.3s ease;
             padding: 8px;
         }
 
         #admin-trigger:hover {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(233, 213, 255, 0.7);
         }
 
         /* Modal Styling */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(6px);
+            inset: 0;
+            background: rgba(6, 3, 13, 0.82);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 100;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .modal-box {
-            background: #131b2e;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: #170d2e;
+            border: 1px solid rgba(216, 180, 254, 0.25);
             padding: 28px;
             border-radius: 16px;
             width: 90%;
-            max-width: 360px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            max-width: 350px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.75);
             text-align: center;
         }
 
         .modal-box h3 {
-            margin-bottom: 18px;
+            font-family: 'Cinzel', serif;
+            margin-bottom: 16px;
             font-weight: 600;
-            color: #e2e8f0;
+            letter-spacing: 1.5px;
+            color: #f3e8ff;
         }
 
         .modal-box input {
@@ -179,15 +265,15 @@
             padding: 12px;
             margin-bottom: 14px;
             border-radius: 8px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            font-size: 1rem;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            background: #0d061c;
+            color: #fff;
+            font-size: 0.95rem;
             outline: none;
         }
 
         .modal-box input:focus {
-            border-color: #38bdf8;
+            border-color: #c084fc;
         }
 
         .btn-group {
@@ -201,79 +287,143 @@
             padding: 11px;
             border: none;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
         }
 
         .btn-primary {
-            background: #0284c7;
+            background: linear-gradient(135deg, #7e22ce, #a855f7);
             color: white;
         }
 
         .btn-secondary {
-            background: #334155;
-            color: #cbd5e1;
+            background: #271947;
+            color: #d8b4fe;
         }
 
         .error-msg {
-            color: #f87171;
-            font-size: 0.85rem;
+            color: #fda4af;
+            font-size: 0.82rem;
             margin-bottom: 10px;
             display: none;
+        }
+
+        @media (max-width: 480px) {
+            .top-caption, .bottom-caption { font-size: 0.75rem; letter-spacing: 4px; }
+            .heart-stage { width: 290px; height: 265px; }
+            .heart-svg { width: 260px; height: 240px; }
+            .inside-percentage { font-size: 1.85rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Starry Sky -->
+    <div class="cosmic-frame"></div>
     <div id="stars-container"></div>
+    <div class="shooting-star"></div>
 
-    <!-- Heart & Meter -->
-    <div class="container">
-        <div class="heart-wrapper">
+    <div class="stage">
+        <div class="top-caption">Among The Galaxies</div>
+
+        <div class="heart-stage">
+            <!-- Celestial Orbit Lines & Echo Hearts -->
+            <svg class="orbit-svg" viewBox="0 0 540 360">
+                <!-- Faint Concentric Heart Echoes -->
+                <path d="M270,315 C270,315 110,205 110,105 C110,50 152,18 198,18 C230,18 256,36 270,58 C284,36 310,18 342,18 C388,18 430,50 430,105 C430,205 270,315 270,315 Z"
+                      fill="none" stroke="rgba(216, 180, 254, 0.08)" stroke-width="1" />
+                <path d="M270,335 C270,335 90,215 90,102 C90,40 138,4 190,4 C226,4 254,24 270,48 C286,24 314,4 350,4 C402,4 450,40 450,102 C450,215 270,335 270,335 Z"
+                      fill="none" stroke="rgba(216, 180, 254, 0.05)" stroke-width="1" />
+                
+                <!-- Sweeping Orbital Arc -->
+                <path d="M 35,215 Q 240,320 495,125" fill="none" stroke="rgba(233, 213, 255, 0.28)" stroke-width="1" />
+                <circle cx="115" cy="246" r="2.5" fill="#ffffff" />
+                <circle cx="495" cy="125" r="3.5" fill="#ffffff" />
+                <circle cx="495" cy="125" r="9" fill="none" stroke="rgba(233, 213, 255, 0.35)" stroke-width="1" />
+            </svg>
+
+            <!-- Constellation Heart with Liquid Inside -->
             <svg class="heart-svg" viewBox="0 0 200 185">
                 <defs>
-                    <!-- Heart Shape Clip Path -->
                     <clipPath id="heart-clip">
                         <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" />
                     </clipPath>
+
+                    <linearGradient id="liquidGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(192, 132, 252, 0.85)" />
+                        <stop offset="55%" stop-color="rgba(126, 34, 206, 0.88)" />
+                        <stop offset="100%" stop-color="rgba(59, 7, 100, 0.95)" />
+                    </linearGradient>
+
+                    <radialGradient id="heartInnerGlow" cx="50%" cy="48%" r="55%">
+                        <stop offset="0%" stop-color="rgba(168, 85, 247, 0.25)" />
+                        <stop offset="100%" stop-color="rgba(19, 9, 38, 0.55)" />
+                    </radialGradient>
+
+                    <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="2.2" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
                 </defs>
 
-                <!-- Heart Background -->
+                <!-- Translucent Galaxy Glass Heart Base -->
                 <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" 
-                      fill="rgba(255, 255, 255, 0.06)" />
+                      fill="url(#heartInnerGlow)" />
 
-                <!-- Liquid Water Inside Heart -->
+                <!-- Liquid Water Rising Inside Heart -->
                 <g clip-path="url(#heart-clip)">
-                    <g id="water-level" class="water-group" transform="translate(0, 165)">
+                    <g id="water-level" class="water-group" transform="translate(0, 160)">
                         <!-- Back Wave -->
-                        <path class="wave-back" d="M0,10 Q50,0 100,10 T200,10 T300,10 T400,10 V200 H0 Z" />
-                        <!-- Front Wave -->
-                        <path class="wave-front" d="M0,12 Q50,22 100,12 T200,12 T300,12 T400,12 V200 H0 Z" />
+                        <path class="wave-back" d="M0,10 Q50,2 100,10 T200,10 T300,10 T400,10 V200 H0 Z" />
+                        <!-- Front Luminous Wave -->
+                        <path class="wave-front" d="M0,12 Q50,20 100,12 T200,12 T300,12 T400,12 V200 H0 Z" />
+                        <!-- Shimmering Surface Line -->
+                        <path class="wave-front" d="M0,12 Q50,20 100,12 T200,12 T300,12 T400,12" fill="none" stroke="rgba(243, 232, 255, 0.7)" stroke-width="1.2" />
                     </g>
+
+                    <!-- Subtle Galaxy Dust Spiral Inside Heart -->
+                    <circle cx="62" cy="72" r="1" fill="#fff" opacity="0.7" />
+                    <circle cx="138" cy="96" r="1.2" fill="#fff" opacity="0.8" />
+                    <circle cx="75" cy="112" r="0.9" fill="#e9d5ff" opacity="0.6" />
+                    <circle cx="128" cy="64" r="1" fill="#e9d5ff" opacity="0.7" />
                 </g>
 
-                <!-- Glowing Heart Border -->
+                <!-- Glowing Lavender-White Heart Outline -->
                 <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" 
-                      fill="none" stroke="#ff2a6d" stroke-width="4" />
+                      fill="none" stroke="#e9d5ff" stroke-width="2.2" filter="url(#starGlow)" />
+
+                <!-- Constellation Star Nodes Along the Heart Border -->
+                <g fill="#ffffff" filter="url(#starGlow)">
+                    <circle cx="100" cy="32" r="2.6" />
+                    <circle cx="64" cy="10" r="2.2" />
+                    <circle cx="136" cy="10" r="2.2" />
+                    <circle cx="24" cy="34" r="2" />
+                    <circle cx="176" cy="34" r="2" />
+                    <circle cx="15" cy="62" r="2.4" />
+                    <circle cx="185" cy="62" r="2.4" />
+                    <circle cx="32" cy="106" r="2" />
+                    <circle cx="168" cy="106" r="2" />
+                    <circle cx="65" cy="146" r="1.8" />
+                    <circle cx="135" cy="146" r="1.8" />
+                    <circle cx="100" cy="175" r="2.8" />
+                </g>
             </svg>
+
+            <!-- Meter Displayed Inside the Heart -->
+            <div class="inside-meter">
+                <div class="inside-percentage"><span id="trust-value">50</span>%</div>
+                <div class="inside-max">OUT OF 1000%</div>
+                <div class="inside-label">Trust Meter</div>
+            </div>
         </div>
 
-        <div class="meter-info">
-            <div class="percentage-display">
-                <strong id="trust-value">50</strong>% <span>/ 1000%</span>
-            </div>
-            <div class="label-text">Trust Meter</div>
-        </div>
+        <div class="bottom-caption">I Found You</div>
     </div>
 
-    <!-- Subtle Admin Button -->
+    <!-- Subtle Admin Gear -->
     <button id="admin-trigger" title="Settings">⚙️</button>
 
     <!-- Admin Login & Edit Modal -->
@@ -290,26 +440,28 @@
         </div>
 
         <div class="modal-box" id="edit-view" style="display: none;">
-            <h3>Update Trust Percentage</h3>
-            <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px;">
-                Set current value (0 to 1000). Auto-grows +5% daily from this point.
+            <h3>Update Trust</h3>
+            <p style="font-size: 0.8rem; color: #d8b4fe; margin-bottom: 14px;">
+                Set value (0 – 1000%). Auto-grows +5% daily from here.
             </p>
             <input type="number" id="new-percentage" min="0" max="1000" step="1" placeholder="e.g. 50, 80, 200">
             <div class="btn-group">
                 <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-                <button class="btn btn-primary" onclick="saveNewPercentage()">Save</button>
+                <button class="btn btn-primary" id="save-btn" onclick="saveNewPercentage()">Save</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. Generate Starry Night Background
+        // PASTE YOUR FIREBASE DATABASE URL BELOW (No trailing slash)
+        const FIREBASE_DB_URL = "PASTE_YOUR_FIREBASE_URL_HERE";
+
+        // Generate Starry Night Background
         const starsContainer = document.getElementById('stars-container');
-        const starCount = 160;
-        for (let i = 0; i < starCount; i++) {
+        for (let i = 0; i < 180; i++) {
             const star = document.createElement('div');
             star.classList.add('star');
-            const size = Math.random() * 2.5 + 1;
+            const size = Math.random() * 2.2 + 0.8;
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
             star.style.top = `${Math.random() * 100}%`;
@@ -319,7 +471,6 @@
             starsContainer.appendChild(star);
         }
 
-        // 2. Trust Meter Calculation Logic (+5% Daily Growth)
         const MAX_TRUST = 1000;
         const DAILY_GROWTH = 5;
         const DEFAULT_BASE = 50;
@@ -329,37 +480,51 @@
             return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
         }
 
-        function initializeTrustData() {
-            let basePercent = localStorage.getItem('trust_base_percent');
-            let baseDate = localStorage.getItem('trust_base_date');
-
-            if (basePercent === null || baseDate === null) {
-                basePercent = DEFAULT_BASE;
-                baseDate = getTodayMidnight();
+        async function loadGlobalTrustData() {
+            // If Firebase URL is not pasted yet, fallback to localStorage so it works immediately
+            if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("PASTE_YOUR")) {
+                let basePercent = localStorage.getItem('trust_base_percent') ?? DEFAULT_BASE;
+                let baseDate = localStorage.getItem('trust_base_date') ?? getTodayMidnight();
                 localStorage.setItem('trust_base_percent', basePercent);
                 localStorage.setItem('trust_base_date', baseDate);
+
+                const daysPassed = Math.max(0, Math.floor((getTodayMidnight() - Number(baseDate)) / 86400000));
+                let currentTrust = Math.min(MAX_TRUST, Math.max(0, Number(basePercent) + daysPassed * DAILY_GROWTH));
+                updateUI(currentTrust);
+                return;
             }
 
-            const msPerDay = 1000 * 60 * 60 * 24;
-            const daysPassed = Math.max(0, Math.floor((getTodayMidnight() - Number(baseDate)) / msPerDay));
-            
-            let currentTrust = Number(basePercent) + (daysPassed * DAILY_GROWTH);
-            if (currentTrust > MAX_TRUST) currentTrust = MAX_TRUST;
-            if (currentTrust < 0) currentTrust = 0;
+            try {
+                const response = await fetch(`${FIREBASE_DB_URL}/trustData.json`);
+                let data = await response.json();
 
-            updateUI(currentTrust);
+                if (!data || data.basePercent === undefined) {
+                    data = { basePercent: DEFAULT_BASE, baseDate: getTodayMidnight() };
+                    await fetch(`${FIREBASE_DB_URL}/trustData.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                const daysPassed = Math.max(0, Math.floor((getTodayMidnight() - Number(data.baseDate)) / 86400000));
+                let currentTrust = Math.min(MAX_TRUST, Math.max(0, Number(data.basePercent) + daysPassed * DAILY_GROWTH));
+                updateUI(currentTrust);
+            } catch (error) {
+                console.error("Database connection error:", error);
+                updateUI(DEFAULT_BASE);
+            }
         }
 
         function updateUI(value) {
             document.getElementById('trust-value').innerText = value;
-
-            // Map 0% - 1000% to SVG Y-coordinates (Empty at Y=168, Full at Y=5)
+            // Map 0% - 1000% to SVG Y-coordinates inside heart (Empty = 165, Full = 5)
             const ratio = Math.min(1, Math.max(0, value / MAX_TRUST));
-            const yPosition = 168 - (ratio * 163);
+            const yPosition = 165 - (ratio * 160);
             document.getElementById('water-level').setAttribute('transform', `translate(0, ${yPosition})`);
         }
 
-        // 3. Admin Modal Logic
+        // Admin Modal Logic
         const modal = document.getElementById('admin-modal');
         const loginView = document.getElementById('login-view');
         const editView = document.getElementById('edit-view');
@@ -391,22 +556,46 @@
             }
         }
 
-        function saveNewPercentage() {
+        async function saveNewPercentage() {
             const inputVal = parseFloat(document.getElementById('new-percentage').value);
             if (isNaN(inputVal) || inputVal < 0 || inputVal > MAX_TRUST) {
                 alert('Please enter a valid number between 0 and 1000.');
                 return;
             }
 
-            // Reset baseline to today with the new custom percentage
-            localStorage.setItem('trust_base_percent', inputVal);
-            localStorage.setItem('trust_base_date', getTodayMidnight());
-            
-            updateUI(inputVal);
-            closeModal();
+            if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("PASTE_YOUR")) {
+                localStorage.setItem('trust_base_percent', inputVal);
+                localStorage.setItem('trust_base_date', getTodayMidnight());
+                updateUI(inputVal);
+                closeModal();
+                return;
+            }
+
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.innerText = 'Saving...';
+            saveBtn.disabled = true;
+
+            const updatedData = {
+                basePercent: inputVal,
+                baseDate: getTodayMidnight()
+            };
+
+            try {
+                await fetch(`${FIREBASE_DB_URL}/trustData.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData)
+                });
+                updateUI(inputVal);
+                closeModal();
+            } catch (err) {
+                alert('Failed to update database. Check your Firebase URL.');
+            } finally {
+                saveBtn.innerText = 'Save';
+                saveBtn.disabled = false;
+            }
         }
 
-        // Allow pressing Enter key in inputs
         document.getElementById('admin-pass').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') verifyLogin();
         });
@@ -414,9 +603,7 @@
             if (e.key === 'Enter') saveNewPercentage();
         });
 
-        // Start on load
-        initializeTrustData();
+        loadGlobalTrustData();
     </script>
 </body>
 </html>
-</body></html>
