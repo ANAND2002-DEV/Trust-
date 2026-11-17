@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Among The Galaxies - Trust Meter</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;500;600&display=swap" rel="stylesheet">
     <style>
@@ -12,33 +12,29 @@
             box-sizing: border-box;
         }
 
-        body {
-            height: 100vh;
-            width: 100vw;
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            width: 100%;
             overflow: hidden;
             background: radial-gradient(circle at 50% 50%, #2a1454 0%, #130926 48%, #06030d 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             color: #f3e8ff;
             font-family: 'Cinzel', serif;
-            position: relative;
+            position: fixed;
+            inset: 0;
         }
 
-        /* Subtle Outer Frame like Reference */
         .cosmic-frame {
             position: fixed;
-            inset: 18px;
+            inset: 14px;
             border: 1px solid rgba(216, 180, 254, 0.16);
             border-radius: 10px;
             pointer-events: none;
-            z-index: 3;
+            z-index: 4;
         }
 
-        /* Starry Night Sky */
         #stars-container {
-            position: absolute;
+            position: fixed;
             inset: 0;
             z-index: 0;
             pointer-events: none;
@@ -57,67 +53,47 @@
             50% { opacity: 0.95; transform: scale(1.2); }
         }
 
-        /* Shooting Star */
-        .shooting-star {
-            position: absolute;
-            top: 22%;
-            left: 16%;
-            width: 110px;
-            height: 1.5px;
-            background: linear-gradient(90deg, rgba(255,255,255,0), rgba(233,213,255,0.95));
-            transform: rotate(24deg);
-            opacity: 0.7;
-            pointer-events: none;
+        #shooting-stars-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             z-index: 1;
+            pointer-events: none;
         }
 
-        .shooting-star::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: -2px;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 0 10px #fff, 0 0 18px #c084fc;
-        }
-
-        /* Main Cosmic Layout */
-        .stage {
-            position: relative;
+        .center-anchor {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            max-width: 720px;
-            padding: 20px;
+            pointer-events: none;
         }
 
         .top-caption, .bottom-caption {
-            font-size: 0.95rem;
-            letter-spacing: 6px;
-            color: rgba(243, 232, 255, 0.85);
+            font-size: 0.9rem;
+            letter-spacing: 5px;
+            color: rgba(243, 232, 255, 0.88);
             text-transform: uppercase;
-            text-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+            text-shadow: 0 0 12px rgba(192, 132, 252, 0.65);
             user-select: none;
+            text-align: center;
+            width: 100%;
         }
 
-        .top-caption {
-            margin-bottom: 18px;
-        }
+        .top-caption { margin-bottom: 16px; }
+        .bottom-caption { margin-top: 16px; }
 
-        .bottom-caption {
-            margin-top: 18px;
-        }
-
-        /* Heart & Orbit Container */
         .heart-stage {
             position: relative;
-            width: 340px;
-            height: 310px;
+            width: 280px;
+            height: 260px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -126,30 +102,31 @@
 
         @keyframes floatHeart {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-7px); }
         }
 
-        /* Decorative Orbit Rings Behind Heart */
         .orbit-svg {
             position: absolute;
-            width: 540px;
-            height: 360px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw;
+            max-width: 540px;
+            height: auto;
             pointer-events: none;
             z-index: 1;
             overflow: visible;
         }
 
-        /* Main Heart SVG */
         .heart-svg {
             position: relative;
-            width: 300px;
-            height: 275px;
+            width: 265px;
+            height: 245px;
             z-index: 2;
             overflow: visible;
             filter: drop-shadow(0 0 22px rgba(168, 85, 247, 0.55));
         }
 
-        /* Liquid Water Waves Inside Heart */
         .water-group {
             transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -169,7 +146,6 @@
             100% { transform: translateX(-200px); }
         }
 
-        /* Meter Text Centered Inside the Heart */
         .inside-meter {
             position: absolute;
             z-index: 4;
@@ -183,7 +159,7 @@
 
         .inside-percentage {
             font-family: 'Montserrat', sans-serif;
-            font-size: 2.1rem;
+            font-size: 2rem;
             font-weight: 600;
             color: #ffffff;
             text-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 28px rgba(192, 132, 252, 0.9);
@@ -192,7 +168,7 @@
 
         .inside-max {
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
             letter-spacing: 1.5px;
             color: #e9d5ff;
@@ -202,18 +178,17 @@
 
         .inside-label {
             font-family: 'Cinzel', serif;
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             letter-spacing: 3px;
             text-transform: uppercase;
             color: rgba(243, 232, 255, 0.85);
             margin-top: 6px;
         }
 
-        /* Hidden Admin Trigger */
         #admin-trigger {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 20px;
+            right: 20px;
             z-index: 10;
             background: transparent;
             border: none;
@@ -224,11 +199,8 @@
             padding: 8px;
         }
 
-        #admin-trigger:hover {
-            color: rgba(233, 213, 255, 0.7);
-        }
+        #admin-trigger:hover { color: rgba(233, 213, 255, 0.7); }
 
-        /* Modal Styling */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -272,9 +244,7 @@
             outline: none;
         }
 
-        .modal-box input:focus {
-            border-color: #c084fc;
-        }
+        .modal-box input:focus { border-color: #c084fc; }
 
         .btn-group {
             display: flex;
@@ -309,11 +279,10 @@
             display: none;
         }
 
-        @media (max-width: 480px) {
-            .top-caption, .bottom-caption { font-size: 0.75rem; letter-spacing: 4px; }
-            .heart-stage { width: 290px; height: 265px; }
-            .heart-svg { width: 260px; height: 240px; }
-            .inside-percentage { font-size: 1.85rem; }
+        @media (min-width: 768px) {
+            .heart-stage { width: 340px; height: 310px; }
+            .heart-svg { width: 300px; height: 275px; }
+            .inside-percentage { font-size: 2.2rem; }
         }
     </style>
 </head>
@@ -321,28 +290,24 @@
 
     <div class="cosmic-frame"></div>
     <div id="stars-container"></div>
-    <div class="shooting-star"></div>
+    <canvas id="shooting-stars-canvas"></canvas>
 
-    <div class="stage">
+    <div class="center-anchor">
         <div class="top-caption">Among The Galaxies</div>
 
         <div class="heart-stage">
-            <!-- Celestial Orbit Lines & Echo Hearts -->
             <svg class="orbit-svg" viewBox="0 0 540 360">
-                <!-- Faint Concentric Heart Echoes -->
                 <path d="M270,315 C270,315 110,205 110,105 C110,50 152,18 198,18 C230,18 256,36 270,58 C284,36 310,18 342,18 C388,18 430,50 430,105 C430,205 270,315 270,315 Z"
                       fill="none" stroke="rgba(216, 180, 254, 0.08)" stroke-width="1" />
                 <path d="M270,335 C270,335 90,215 90,102 C90,40 138,4 190,4 C226,4 254,24 270,48 C286,24 314,4 350,4 C402,4 450,40 450,102 C450,215 270,335 270,335 Z"
                       fill="none" stroke="rgba(216, 180, 254, 0.05)" stroke-width="1" />
                 
-                <!-- Sweeping Orbital Arc -->
                 <path d="M 35,215 Q 240,320 495,125" fill="none" stroke="rgba(233, 213, 255, 0.28)" stroke-width="1" />
                 <circle cx="115" cy="246" r="2.5" fill="#ffffff" />
                 <circle cx="495" cy="125" r="3.5" fill="#ffffff" />
                 <circle cx="495" cy="125" r="9" fill="none" stroke="rgba(233, 213, 255, 0.35)" stroke-width="1" />
             </svg>
 
-            <!-- Constellation Heart with Liquid Inside -->
             <svg class="heart-svg" viewBox="0 0 200 185">
                 <defs>
                     <clipPath id="heart-clip">
@@ -369,33 +334,25 @@
                     </filter>
                 </defs>
 
-                <!-- Translucent Galaxy Glass Heart Base -->
                 <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" 
                       fill="url(#heartInnerGlow)" />
 
-                <!-- Liquid Water Rising Inside Heart -->
                 <g clip-path="url(#heart-clip)">
                     <g id="water-level" class="water-group" transform="translate(0, 160)">
-                        <!-- Back Wave -->
                         <path class="wave-back" d="M0,10 Q50,2 100,10 T200,10 T300,10 T400,10 V200 H0 Z" />
-                        <!-- Front Luminous Wave -->
                         <path class="wave-front" d="M0,12 Q50,20 100,12 T200,12 T300,12 T400,12 V200 H0 Z" />
-                        <!-- Shimmering Surface Line -->
                         <path class="wave-front" d="M0,12 Q50,20 100,12 T200,12 T300,12 T400,12" fill="none" stroke="rgba(243, 232, 255, 0.7)" stroke-width="1.2" />
                     </g>
 
-                    <!-- Subtle Galaxy Dust Spiral Inside Heart -->
                     <circle cx="62" cy="72" r="1" fill="#fff" opacity="0.7" />
                     <circle cx="138" cy="96" r="1.2" fill="#fff" opacity="0.8" />
                     <circle cx="75" cy="112" r="0.9" fill="#e9d5ff" opacity="0.6" />
                     <circle cx="128" cy="64" r="1" fill="#e9d5ff" opacity="0.7" />
                 </g>
 
-                <!-- Glowing Lavender-White Heart Outline -->
                 <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" 
                       fill="none" stroke="#e9d5ff" stroke-width="2.2" filter="url(#starGlow)" />
 
-                <!-- Constellation Star Nodes Along the Heart Border -->
                 <g fill="#ffffff" filter="url(#starGlow)">
                     <circle cx="100" cy="32" r="2.6" />
                     <circle cx="64" cy="10" r="2.2" />
@@ -412,7 +369,6 @@
                 </g>
             </svg>
 
-            <!-- Meter Displayed Inside the Heart -->
             <div class="inside-meter">
                 <div class="inside-percentage"><span id="trust-value">50</span>%</div>
                 <div class="inside-max">OUT OF 1000%</div>
@@ -423,10 +379,8 @@
         <div class="bottom-caption">I Found You</div>
     </div>
 
-    <!-- Subtle Admin Gear -->
     <button id="admin-trigger" title="Settings">⚙️</button>
 
-    <!-- Admin Login & Edit Modal -->
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-box" id="login-view">
             <h3>Admin Access</h3>
@@ -451,12 +405,11 @@
             </div>
         </div>
     </div>
-
-    <script>
+        <script>
         // PASTE YOUR FIREBASE DATABASE URL BELOW (No trailing slash)
         const FIREBASE_DB_URL = "PASTE_YOUR_FIREBASE_URL_HERE";
 
-        // Generate Starry Night Background
+        // 1. Twinkling Background Stars
         const starsContainer = document.getElementById('stars-container');
         for (let i = 0; i < 180; i++) {
             const star = document.createElement('div');
@@ -471,6 +424,115 @@
             starsContainer.appendChild(star);
         }
 
+        // 2. Real Multi-Directional Shooting Stars Engine
+        const canvas = document.getElementById('shooting-stars-canvas');
+        const ctx = canvas.getContext('2d');
+        let shootingStars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class ShootingStar {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                const edge = Math.floor(Math.random() * 4);
+                const w = canvas.width;
+                const h = canvas.height;
+                let angle;
+
+                if (edge === 0) {
+                    this.x = Math.random() * w;
+                    this.y = -30;
+                    angle = (Math.random() * 110 + 35) * (Math.PI / 180);
+                } else if (edge === 1) {
+                    this.x = w + 30;
+                    this.y = Math.random() * h;
+                    angle = (Math.random() * 110 + 125) * (Math.PI / 180);
+                } else if (edge === 2) {
+                    this.x = Math.random() * w;
+                    this.y = h + 30;
+                    angle = (Math.random() * 110 + 215) * (Math.PI / 180);
+                } else {
+                    this.x = -30;
+                    this.y = Math.random() * h;
+                    angle = (Math.random() * 110 - 55) * (Math.PI / 180);
+                }
+
+                this.speed = Math.random() * 9 + 7;
+                this.vx = Math.cos(angle) * this.speed;
+                this.vy = Math.sin(angle) * this.speed;
+                this.length = Math.random() * 110 + 75;
+                this.size = Math.random() * 1.6 + 1.2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                const margin = 180;
+                return !(
+                    this.x < -margin ||
+                    this.x > canvas.width + margin ||
+                    this.y < -margin ||
+                    this.y > canvas.height + margin
+                );
+            }
+
+            draw() {
+                const tailX = this.x - (this.vx / this.speed) * this.length;
+                const tailY = this.y - (this.vy / this.speed) * this.length;
+
+                const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                grad.addColorStop(0.3, 'rgba(216, 180, 254, 0.55)');
+                grad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(tailX, tailY);
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = this.size;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 1.4, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = '#e9d5ff';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        setInterval(() => {
+            if (shootingStars.length < 5) {
+                shootingStars.push(new ShootingStar());
+            }
+        }, 1100);
+
+        shootingStars.push(new ShootingStar());
+        setTimeout(() => shootingStars.push(new ShootingStar()), 450);
+
+        function animateShootingStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            shootingStars = shootingStars.filter(star => {
+                const alive = star.update();
+                if (alive) star.draw();
+                return alive;
+            });
+            requestAnimationFrame(animateShootingStars);
+        }
+        animateShootingStars();
+
+        // 3. Trust Meter Logic (+5% Daily Growth)
         const MAX_TRUST = 1000;
         const DAILY_GROWTH = 5;
         const DEFAULT_BASE = 50;
@@ -481,7 +543,6 @@
         }
 
         async function loadGlobalTrustData() {
-            // If Firebase URL is not pasted yet, fallback to localStorage so it works immediately
             if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("PASTE_YOUR")) {
                 let basePercent = localStorage.getItem('trust_base_percent') ?? DEFAULT_BASE;
                 let baseDate = localStorage.getItem('trust_base_date') ?? getTodayMidnight();
@@ -518,13 +579,12 @@
 
         function updateUI(value) {
             document.getElementById('trust-value').innerText = value;
-            // Map 0% - 1000% to SVG Y-coordinates inside heart (Empty = 165, Full = 5)
             const ratio = Math.min(1, Math.max(0, value / MAX_TRUST));
             const yPosition = 165 - (ratio * 160);
             document.getElementById('water-level').setAttribute('transform', `translate(0, ${yPosition})`);
         }
 
-        // Admin Modal Logic
+        // 4. Admin Modal Logic
         const modal = document.getElementById('admin-modal');
         const loginView = document.getElementById('login-view');
         const editView = document.getElementById('edit-view');
