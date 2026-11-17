@@ -1,1024 +1,1093 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Our Trust Universe</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #ff2a6d;
-      --secondary: #ff758f;
-      --glow: rgba(255, 42, 109, 0.65);
-      --nebula-1: rgba(255, 42, 109, 0.16);
-      --nebula-2: rgba(114, 9, 183, 0.22);
-      --bg-top: #040611;
-      --bg-mid: #0b1026;
-      --bg-bottom: #180c29;
-      --glass-bg: rgba(15, 22, 48, 0.55);
-      --glass-border: rgba(255, 255, 255, 0.14);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Among The Galaxies - Trust Meter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-center: #2a1454;
+            --bg-mid: #130926;
+            --accent-glow: rgba(168, 85, 247, 0.55);
+            --text-glow: rgba(192, 132, 252, 0.85);
+            --wave-back: rgba(139, 92, 246, 0.52);
+            --liq-top: rgba(192, 132, 252, 0.85);
+            --liq-mid: rgba(126, 34, 206, 0.88);
+            --liq-bot: rgba(59, 7, 100, 0.95);
+            --stroke-main: #e9d5ff;
+            --btn-grad: linear-gradient(135deg, #7e22ce, #a855f7);
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at 20% 20%, var(--nebula-1), transparent 45%),
-                  radial-gradient(circle at 80% 75%, var(--nebula-2), transparent 50%),
-                  linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 52%, var(--bg-bottom) 100%);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-      transition: background 1.2s ease;
-      user-select: none;
-    }
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            width: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, var(--bg-center) 0%, var(--bg-mid) 48%, #06030d 100%);
+            color: #f3e8ff;
+            font-family: 'Cinzel', serif;
+            position: fixed;
+            inset: 0;
+            transition: background 1s ease;
+            touch-action: none;
+        }
 
-    canvas#starfield {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
+        .cosmic-frame {
+            position: fixed;
+            inset: 14px;
+            border: 1px solid rgba(216, 180, 254, 0.16);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 4;
+        }
 
-    .aurora-orb {
-      position: fixed;
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      background: var(--primary);
-      filter: blur(130px);
-      opacity: 0.14;
-      z-index: 0;
-      pointer-events: none;
-      animation: floatOrb 14s ease-in-out infinite alternate;
-    }
+        #sky-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            cursor: crosshair;
+        }
 
-    .aurora-orb.orb-2 {
-      bottom: -80px;
-      right: -60px;
-      background: var(--secondary);
-      animation-delay: -7s;
-    }
+        .center-anchor {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            pointer-events: none;
+            padding: 0 24px;
+        }
 
-    @keyframes floatOrb {
-      0% { transform: translate(-20px, -20px) scale(0.95); }
-      100% { transform: translate(30px, 25px) scale(1.12); }
-    }
-          .app-shell {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 430px;
-      padding: 20px 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
+        .top-caption, .bottom-caption {
+            font-size: 0.88rem;
+            letter-spacing: 5px;
+            color: rgba(243, 232, 255, 0.9);
+            text-transform: uppercase;
+            text-shadow: 0 0 12px var(--text-glow);
+            user-select: none;
+            text-align: center;
+            width: 100%;
+        }
 
-    .top-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px);
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: var(--secondary);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-    }
+        .top-caption { margin-bottom: 14px; }
+        .bottom-caption { margin-top: 14px; }
 
-    .pulse-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 10px var(--primary);
-      animation: pulseDot 2s infinite;
-    }
+        .streak-badge {
+            margin-top: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: rgba(233, 213, 255, 0.72);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px 14px;
+            border-radius: 20px;
+            text-align: center;
+        }
 
-    @keyframes pulseDot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.45); opacity: 0.55; }
-    }
+        .milestone-pill {
+            margin-top: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--text-glow);
+            opacity: 0.85;
+        }
 
-    .title-heading {
-      font-family: 'Cinzel', serif;
-      font-size: 1.55rem;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-align: center;
-      background: linear-gradient(135deg, #ffffff 20%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-    }
+        .heart-stage {
+            position: relative;
+            width: 270px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floatHeart 5s ease-in-out infinite;
+        }
 
-    .heart-stage {
-      position: relative;
-      width: 265px;
-      height: 245px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      filter: drop-shadow(0 0 28px var(--glow));
-    }
+        @keyframes floatHeart {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+              .orbit-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw;
+            max-width: 540px;
+            height: auto;
+            pointer-events: none;
+            z-index: 1;
+            overflow: visible;
+        }
 
-    .heart-stage:active {
-      transform: scale(0.93);
-    }
+        .heart-svg {
+            position: relative;
+            width: 255px;
+            height: 235px;
+            z-index: 2;
+            overflow: visible;
+            filter: drop-shadow(0 0 22px var(--accent-glow));
+            transition: filter 0.8s ease;
+        }
 
-    .heart-stage.overdrive {
-      animation: heartBeatOverdrive 2.4s ease-in-out infinite;
-    }
+        .water-group {
+            transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
 
-    @keyframes heartBeatOverdrive {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 28px var(--glow)); }
-      14% { transform: scale(1.045); filter: drop-shadow(0 0 42px var(--glow)); }
-      28% { transform: scale(1); }
-      42% { transform: scale(1.03); filter: drop-shadow(0 0 36px var(--glow)); }
-      70% { transform: scale(1); }
-    }
+        .wave-back {
+            fill: var(--wave-back);
+            animation: waveMove 7s linear infinite;
+            transition: fill 0.8s ease;
+        }
 
-    svg.heart-svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
+        .wave-front {
+            fill: url(#liquidGradient);
+            animation: waveMove 4.5s linear infinite reverse;
+        }
 
-    .wave-back {
-      fill: var(--secondary);
-      opacity: 0.45;
-      animation: waveSlideBack 5.5s linear infinite;
-    }
+        @keyframes waveMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-200px); }
+        }
 
-    .wave-front {
-      fill: var(--primary);
-      opacity: 0.92;
-      animation: waveSlideFront 3.8s linear infinite;
-    }
+        .inside-meter {
+            position: absolute;
+            z-index: 4;
+            top: 47%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            width: 200px;
+        }
 
-    @keyframes waveSlideFront {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-200px); }
-    }
+        .inside-percentage {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.9), 0 0 28px var(--text-glow);
+            line-height: 1.1;
+        }
 
-    @keyframes waveSlideBack {
-      0% { transform: translateX(-200px); }
-      100% { transform: translateX(0); }
-    }
+        .inside-max {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            color: #e9d5ff;
+            margin-top: 3px;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+        }
 
-    .heart-readout {
-      position: absolute;
-      top: 47%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      pointer-events: none;
-      width: 80%;
-    }
+        .inside-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(243, 232, 255, 0.85);
+            margin-top: 5px;
+        }
 
-    .trust-value {
-      font-size: 2.35rem;
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: 0.5px;
-      color: #ffffff;
-      text-shadow: 0 3px 14px rgba(0, 0, 0, 0.85);
-    }
+        .corner-btn {
+            position: fixed;
+            bottom: 20px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(233, 213, 255, 0.55);
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    .trust-sub {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 1.4px;
-      color: rgba(255, 255, 255, 0.85);
-      margin-top: 3px;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-    }
-          .glass-card {
-      width: 100%;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(14px);
-      border-radius: 20px;
-      padding: 16px 18px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    }
+        .corner-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
 
-    .caption-text {
-      font-size: 1.02rem;
-      line-height: 1.55;
-      color: #f1f5f9;
-      font-weight: 500;
-      min-height: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        #music-toggle { left: 20px; }
+        #admin-trigger {
+            right: 20px;
+            background: transparent;
+            border-color: transparent;
+            color: rgba(233, 213, 255, 0.18);
+        }
+              .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 3, 13, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            font-family: 'Montserrat', sans-serif;
+            padding: 16px;
+        }
 
-    .milestone-pill {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.09);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
+        .modal-box {
+            background: #150b2b;
+            border: 1px solid rgba(216, 180, 254, 0.25);
+            padding: 22px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 370px;
+            max-height: 88dvh;
+            overflow-y: auto;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+            text-align: left;
+        }
 
-    .milestone-pill span.tier-name {
-      color: var(--secondary);
-      font-weight: 600;
-    }
+        .modal-box h3 {
+            font-family: 'Cinzel', serif;
+            margin-bottom: 14px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: #f3e8ff;
+            text-align: center;
+        }
 
-    .music-deck {
-      width: 100%;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(14px);
-      border-radius: 18px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
+        .field-label {
+            display: block;
+            font-size: 0.72rem;
+            color: #c4b5fd;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
 
-    .track-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      overflow: hidden;
-      flex: 1;
-    }
+        .modal-box input, .modal-box select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            background: #0c051a;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
 
-    .eq-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 2px;
-      height: 14px;
-      width: 16px;
-      flex-shrink: 0;
-    }
+        .modal-box input:focus, .modal-box select:focus {
+            border-color: #c084fc;
+        }
 
-    .eq-bars span {
-      display: block;
-      width: 3px;
-      height: 4px;
-      background: var(--primary);
-      border-radius: 2px;
-      transition: height 0.2s;
-    }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
 
-    .eq-bars.playing span:nth-child(1) { animation: eqAnim 0.7s infinite alternate; }
-    .eq-bars.playing span:nth-child(2) { animation: eqAnim 0.5s infinite alternate 0.2s; }
-    .eq-bars.playing span:nth-child(3) { animation: eqAnim 0.8s infinite alternate 0.1s; }
+        .btn {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
 
-    @keyframes eqAnim {
-      0% { height: 4px; }
-      100% { height: 14px; }
-    }
+        .btn-primary {
+            background: var(--btn-grad);
+            color: white;
+        }
 
-    .track-title {
-      font-size: 0.82rem;
-      color: #e2e8f0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+        .btn-secondary {
+            background: #271947;
+            color: #d8b4fe;
+        }
 
-    .music-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
+        .error-msg {
+            color: #fda4af;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: none;
+            text-align: center;
+        }
 
-    .icon-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #fff;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.88rem;
-      transition: all 0.2s;
-    }
+        .sync-note {
+            color: #c4b5fd;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            text-align: center;
+            min-height: 16px;
+        }
 
-    .icon-btn:hover {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .tap-particle {
-      position: fixed;
-      pointer-events: none;
-      z-index: 6;
-      font-size: 1.1rem;
-      animation: floatParticle 1.2s ease-out forwards;
-    }
-
-    @keyframes floatParticle {
-      0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
-      100% { transform: translate(var(--dx), var(--dy)) scale(1.3); opacity: 0; }
-    }
-
-    .gear-btn {
-      position: fixed;
-      bottom: 14px;
-      right: 14px;
-      z-index: 8;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.25);
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-    }
-
-    .gear-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.14);
-    }
-
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      background: rgba(2, 4, 12, 0.86);
-      backdrop-filter: blur(10px);
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .modal-backdrop.open { display: flex; }
-
-    .modal-panel {
-      background: #0d142c;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 20px;
-      padding: 22px;
-      width: 100%;
-      max-width: 390px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .modal-header h3 { font-size: 1.15rem; font-weight: 700; }
-
-    .form-group { margin-bottom: 12px; }
-    .form-group label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: #070b1a;
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.92rem;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .btn-save {
-      flex: 1;
-      padding: 11px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.92rem;
-      cursor: pointer;
-    }
-
-    .btn-cancel {
-      padding: 11px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      background: transparent;
-      color: #cbd5e1;
-      font-size: 0.92rem;
-      cursor: pointer;
-    }
-
-    .sync-status {
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: #38bdf8;
-      text-align: center;
-      min-height: 18px;
-    }
-  </style>
+        @media (min-width: 768px) {
+            .heart-stage { width: 330px; height: 300px; }
+            .heart-svg { width: 295px; height: 270px; }
+            .inside-percentage { font-size: 2.2rem; }
+        }
+    </style>
 </head>
 <body>
-  <canvas id="starfield"></canvas>
-  <div class="aurora-orb"></div>
-  <div class="aurora-orb orb-2"></div>
 
-  <main class="app-shell">
-    <div class="top-badge">
-      <span class="pulse-dot"></span>
-      <span id="liveSyncBadge">Live Trust Connection</span>
+    <div class="cosmic-frame"></div>
+    <canvas id="sky-canvas"></canvas>
+
+    <div class="center-anchor">
+        <div class="top-caption" id="ui-top-caption">Among The Galaxies</div>
+
+        <div class="heart-stage">
+            <svg class="orbit-svg" viewBox="0 0 540 360">
+                <path d="M270,315 C270,315 110,205 110,105 C110,50 152,18 198,18 C230,18 256,36 270,58 C284,36 310,18 342,18 C388,18 430,50 430,105 C430,205 270,315 270,315 Z"
+                      fill="none" stroke="rgba(216, 180, 254, 0.08)" stroke-width="1" />
+                <path d="M270,335 C270,335 90,215 90,102 C90,40 138,4 190,4 C226,4 254,24 270,48 C286,24 314,4 350,4 C402,4 450,40 450,102 C450,215 270,335 270,335 Z"
+                      fill="none" stroke="rgba(216, 180, 254, 0.05)" stroke-width="1" />
+                
+                <path d="M 35,215 Q 240,320 495,125" fill="none" stroke="rgba(233, 213, 255, 0.28)" stroke-width="1" />
+                <circle cx="115" cy="246" r="2.5" fill="#ffffff" />
+                <circle cx="495" cy="125" r="3.5" fill="#ffffff" />
+                <circle cx="495" cy="125" r="9" fill="none" stroke="rgba(233, 213, 255, 0.35)" stroke-width="1" />
+            </svg>
+
+            <svg class="heart-svg" viewBox="0 0 200 185">
+                <defs>
+                    <clipPath id="heart-clip">
+                        <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" />
+                    </clipPath>
+
+                    <linearGradient id="liquidGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop id="grad-stop-1" offset="0%" stop-color="rgba(192, 132, 252, 0.85)" />
+                        <stop id="grad-stop-2" offset="55%" stop-color="rgba(126, 34, 206, 0.88)" />
+                        <stop id="grad-stop-3" offset="100%" stop-color="rgba(59, 7, 100, 0.95)" />
+                    </linearGradient>
+
+                    <radialGradient id="heartInnerGlow" cx="50%" cy="48%" r="55%">
+                        <stop offset="0%" stop-color="rgba(168, 85, 247, 0.22)" />
+                        <stop offset="100%" stop-color="rgba(19, 9, 38, 0.55)" />
+                    </radialGradient>
+
+                    <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="2.2" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <path d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" 
+                      fill="url(#heartInnerGlow)" />
+
+                <g clip-path="url(#heart-clip)">
+                    <g id="water-level" class="water-group" transform="translate(0, 160)">
+                        <path class="wave-back" d="M0,10 Q50,2 100,10 T200,10 T300,10 T400,10 V200 H0 Z" />
+                        <path class="wave-front" d="M0,12 Q50,20 100,12 T200,12 T300,12 T400,12 V200 H0 Z" />
+                        <path class="wave-front" d="M0,12 Q50,20 100,12 T200,12 T300,12 T400,12" fill="none" stroke="rgba(255, 255, 255, 0.65)" stroke-width="1.2" />
+                    </g>
+
+                    <circle cx="62" cy="72" r="1" fill="#fff" opacity="0.7" />
+                    <circle cx="138" cy="96" r="1.2" fill="#fff" opacity="0.8" />
+                    <circle cx="75" cy="112" r="0.9" fill="#e9d5ff" opacity="0.6" />
+                    <circle cx="128" cy="64" r="1" fill="#e9d5ff" opacity="0.7" />
+                </g>
+
+                <path id="heart-outline-path" d="M100,175 C100,175 15,115 15,58 C15,28 38,10 64,10 C82,10 95,20 100,32 C105,20 118,10 136,10 C162,10 185,28 185,58 C185,115 100,175 100,175 Z" 
+                      fill="none" stroke="#e9d5ff" stroke-width="2.2" filter="url(#starGlow)" />
+
+                <g fill="#ffffff" filter="url(#starGlow)">
+                    <circle cx="100" cy="32" r="2.6" />
+                    <circle cx="64" cy="10" r="2.2" />
+                    <circle cx="136" cy="10" r="2.2" />
+                    <circle cx="24" cy="34" r="2" />
+                    <circle cx="176" cy="34" r="2" />
+                    <circle cx="15" cy="62" r="2.4" />
+                    <circle cx="185" cy="62" r="2.4" />
+                    <circle cx="32" cy="106" r="2" />
+                    <circle cx="168" cy="106" r="2" />
+                    <circle cx="65" cy="146" r="1.8" />
+                    <circle cx="135" cy="146" r="1.8" />
+                    <circle cx="100" cy="175" r="2.8" />
+                </g>
+            </svg>
+
+            <div class="inside-meter">
+                <div class="inside-percentage"><span id="trust-value">50</span>%</div>
+                <div class="inside-max">OUT OF 1000%</div>
+                <div class="inside-label">Trust Meter</div>
+            </div>
+        </div>
+
+        <div class="bottom-caption" id="ui-bottom-caption">I Found You</div>
+        <div class="milestone-pill" id="ui-milestone">✦ETERNAL US✦</div>
+        <div class="streak-badge" id="ui-streak">Day 1 of growing together</div>
     </div>
 
-    <h1 class="title-heading">Our Trust Universe</h1>
+    <button id="music-toggle" class="corner-btn" title="Play / Mute Music">🔇</button>
+    <button id="track-switch" class="corner-btn" style="left: 64px;" title="Change Melody">🎵</button>
+    <div id="track-toast" style="position: fixed; bottom: 64px; left: 20px; z-index: 10; font-family: 'Montserrat', sans-serif; font-size: 0.72rem; letter-spacing: 1px; color: #f3e8ff; background: rgba(21, 11, 43, 0.85); border: 1px solid rgba(216, 180, 254, 0.25); padding: 6px 12px; border-radius: 20px; opacity: 0; transition: opacity 0.4s ease; pointer-events: none;"></div>
+    <button id="admin-trigger" class="corner-btn" title="Settings">⚙️</button>
 
-    <div class="heart-stage" id="heartStage" title="Tap the heart">
-      <svg class="heart-svg" viewBox="0 0 200 185">
-        <defs>
-          <clipPath id="heartClipPath">
-            <path d="M100,175 C100,175 14,118 14,60 C14,30 37,10 64,10 C81,10 94,19 100,32 C106,19 119,10 136,10 C163,10 186,30 186,60 C186,118 100,175 100,175 Z"/>
-          </clipPath>
-          <linearGradient id="heartStrokeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
-            <stop offset="50%" stop-color="var(--secondary)" stop-opacity="0.6"/>
-            <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.8"/>
-          </linearGradient>
-        </defs>
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-box" id="login-view">
+            <h3>Admin Access</h3>
+            <div id="login-error" class="error-msg">Invalid username or password</div>
+            <label class="field-label">Username</label>
+            <input type="text" id="admin-user" placeholder="Username" autocomplete="off">
+            <label class="field-label">Password</label>
+            <input type="password" id="admin-pass" placeholder="Password">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="verifyLogin()">Login</button>
+            </div>
+        </div>
 
-        <!-- Heart Glass Backdrop -->
-        <path d="M100,175 C100,175 14,118 14,60 C14,30 37,10 64,10 C81,10 94,19 100,32 C106,19 119,10 136,10 C163,10 186,30 186,60 C186,118 100,175 100,175 Z"
-              fill="rgba(255, 255, 255, 0.05)"
-              stroke="url(#heartStrokeGrad)"
-              stroke-width="3.2"/>
+        <div class="modal-box" id="edit-view" style="display: none;">
+            <h3>Admin Controls</h3>
 
-        <!-- Liquid Fill Group -->
-        <g clip-path="url(#heartClipPath)">
-          <g id="liquidLevelGroup" transform="translate(0, 185)">
-            <!-- Back Wave -->
-            <path class="wave-back" d="M0,0 Q50,-12 100,0 T200,0 T300,0 T400,0 V200 H0 Z"/>
-            <!-- Front Wave -->
-            <path class="wave-front" d="M0,2 Q50,14 100,2 T200,2 T300,2 T400,2 V200 H0 Z"/>
-          </g>
-          <!-- Rising Bubbles Inside Liquid -->
-          <g id="liquidBubbles"></g>
-        </g>
+            <label class="field-label">Trust Percentage (0 – 1000%, +5% daily)</label>
+            <input type="number" id="new-percentage" min="0" max="1000" step="1">
 
-        <!-- Inner Specular Shine -->
-        <path d="M42,36 C32,44 28,57 31,70" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="3" stroke-linecap="round"/>
-      </svg>
+            <label class="field-label">Liquid Color Theme</label>
+            <select id="theme-select">
+                <option value="violet">Cosmic Violet (Default)</option>
+                <option value="rose">Rose Nebula (Pink / Crimson)</option>
+                <option value="cyan">Ocean Cyan (Deep Blue / Aqua)</option>
+                <option value="emerald">Aurora Emerald (Teal / Green)</option>
+            </select>
 
-      <div class="heart-readout">
-        <div class="trust-value" id="trustPercentText">0%</div>
-        <div class="trust-sub" id="trustSubLabel">Loading...</div>
-      </div>
+            <label class="field-label">Default Background Melody</label>
+            <select id="music-select">
+                <option value="clair">Clair de Lune (Romantic Piano)</option>
+                <option value="moonlight">Moonlight Serenade (Emotional Piano)</option>
+                <option value="musicbox">Starlight Music Box (Chimes)</option>
+            </select>
+
+            <label class="field-label">Top Caption</label>
+            <input type="text" id="edit-top-caption" placeholder="Among The Galaxies">
+
+            <label class="field-label">Bottom Caption</label>
+            <input type="text" id="edit-bottom-caption" placeholder="I Found You">
+
+            <label class="field-label">Current Day Number (Auto +1 daily)</label>
+            <input type="number" id="edit-day-number" min="1" step="1">
+
+            <label class="field-label">Day Counter Caption (Use {day} for number)</label>
+            <input type="text" id="edit-streak-caption" placeholder="Day {day} of growing together">
+
+            <label class="field-label">GitHub Token (Saved on your phone)</label>
+            <input type="password" id="github-token-input" placeholder="github_pat_...">
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn btn-primary" id="save-btn" onclick="saveAdminSettings()">Save All</button>
+            </div>
+            <div class="sync-note" id="sync-note"></div>
+        </div>
     </div>
+        <script>
+        // GitHub Repo Configuration (Zero Firebase)
+        const GITHUB_OWNER = "ANAND2002-DEV";
+        const GITHUB_REPO  = "Trust-";
+        const DATA_FILE    = "data.json";
 
-    <section class="glass-card">
-      <div class="caption-text" id="milestoneCaption">Connecting to the stars...</div>
-      <div class="milestone-pill">
-        <span>Current Tier</span>
-        <span class="tier-name" id="tierBadgeText">Spark of Trust</span>
-      </div>
-    </section>
+        // 1. Liquid & Galaxy Themes
+        const THEMES = {
+            violet: {
+                bgCenter: '#2a1454', bgMid: '#130926',
+                accentGlow: 'rgba(168, 85, 247, 0.55)', textGlow: 'rgba(192, 132, 252, 0.85)',
+                waveBack: 'rgba(139, 92, 246, 0.52)',
+                liqTop: 'rgba(192, 132, 252, 0.85)', liqMid: 'rgba(126, 34, 206, 0.88)', liqBot: 'rgba(59, 7, 100, 0.95)',
+                stroke: '#e9d5ff', btnGrad: 'linear-gradient(135deg, #7e22ce, #a855f7)'
+            },
+            rose: {
+                bgCenter: '#4c1130', bgMid: '#1f0714',
+                accentGlow: 'rgba(244, 63, 94, 0.55)', textGlow: 'rgba(251, 113, 133, 0.85)',
+                waveBack: 'rgba(225, 29, 72, 0.48)',
+                liqTop: 'rgba(251, 113, 133, 0.85)', liqMid: 'rgba(190, 18, 60, 0.88)', liqBot: 'rgba(88, 12, 31, 0.95)',
+                stroke: '#ffe4e6', btnGrad: 'linear-gradient(135deg, #be123c, #f43f5e)'
+            },
+            cyan: {
+                bgCenter: '#0c3547', bgMid: '#051622',
+                accentGlow: 'rgba(56, 189, 248, 0.55)', textGlow: 'rgba(125, 211, 252, 0.85)',
+                waveBack: 'rgba(2, 132, 199, 0.48)',
+                liqTop: 'rgba(56, 189, 248, 0.85)', liqMid: 'rgba(3, 105, 161, 0.88)', liqBot: 'rgba(8, 47, 73, 0.95)',
+                stroke: '#e0f2fe', btnGrad: 'linear-gradient(135deg, #0369a1, #0ea5e9)'
+            },
+            emerald: {
+                bgCenter: '#0d3b2e', bgMid: '#051c16',
+                accentGlow: 'rgba(52, 211, 153, 0.55)', textGlow: 'rgba(110, 231, 183, 0.85)',
+                waveBack: 'rgba(5, 150, 105, 0.48)',
+                liqTop: 'rgba(52, 211, 153, 0.85)', liqMid: 'rgba(4, 120, 87, 0.88)', liqBot: 'rgba(6, 78, 59, 0.95)',
+                stroke: '#d1fae5', btnGrad: 'linear-gradient(135deg, #047857, #10b981)'
+            }
+        };
 
-    <section class="music-deck">
-      <div class="track-info">
-        <div class="eq-bars" id="eqBars">
-          <span></span><span></span><span></span>
-        </div>
-        <div class="track-title" id="trackTitleDisplay">Midnight Stargazing</div>
-      </div>
-      <div class="music-controls">
-        <button class="icon-btn" id="prevTrackBtn" title="Previous Track">⏮</button>
-        <button class="icon-btn" id="playPauseBtn" title="Play / Pause">▶</button>
-        <button class="icon-btn" id="nextTrackBtn" title="Next Track">⏭</button>
-      </div>
-    </section>
-  </main>
+        function applyTheme(themeKey) {
+            const t = THEMES[themeKey] || THEMES.violet;
+            const r = document.documentElement.style;
+            r.setProperty('--bg-center', t.bgCenter);
+            r.setProperty('--bg-mid', t.bgMid);
+            r.setProperty('--accent-glow', t.accentGlow);
+            r.setProperty('--text-glow', t.textGlow);
+            r.setProperty('--wave-back', t.waveBack);
+            r.setProperty('--btn-grad', t.btnGrad);
+            document.getElementById('grad-stop-1').setAttribute('stop-color', t.liqTop);
+            document.getElementById('grad-stop-2').setAttribute('stop-color', t.liqMid);
+            document.getElementById('grad-stop-3').setAttribute('stop-color', t.liqBot);
+            document.getElementById('heart-outline-path').setAttribute('stroke', t.stroke);
+        }
 
-  <button class="gear-btn" id="openAdminBtn" title="Admin Settings">⚙</button>
+        // 2. Interactive Star Constellations & Multi-Directional Shooting Stars
+        const canvas = document.getElementById('sky-canvas');
+        const ctx = canvas.getContext('2d');
+        let bgStars = [];
+        let shootingStars = [];
+        let pointer = { x: null, y: null, active: false };
 
-  <!-- Admin Settings Modal -->
-  <div class="modal-backdrop" id="adminModal">
-    <div class="modal-panel">
-      <div class="modal-header">
-        <h3>Admin Controls</h3>
-        <button class="icon-btn" id="closeAdminBtn" style="width:28px;height:28px;">✕</button>
-      </div>
+        function initSky() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            bgStars = [];
+            const count = Math.min(160, Math.floor((canvas.width * canvas.height) / 5500));
+            for (let i = 0; i < count; i++) {
+                bgStars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.8 + 0.6,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: Math.random() * 0.03 + 0.01
+                });
+            }
+        }
+        window.addEventListener('resize', initSky);
+        initSky();
 
-      <div id="adminLoginBox">
-        <div class="form-group">
-          <label>Admin Password</label>
-          <input type="password" id="adminPassField" placeholder="Enter your secret password" />
-        </div>
-        <div class="modal-actions">
-          <button class="btn-save" id="unlockAdminBtn">Unlock Controls</button>
-          <button class="btn-cancel" id="cancelLoginBtn">Cancel</button>
-        </div>
-      </div>
-
-      <div id="adminEditorBox" style="display:none;">
-        <div class="form-group">
-          <label>Trust Level (0% to 1000%)</label>
-          <input type="number" id="editTrustInput" min="0" max="1000" />
-        </div>
-        <div class="form-group">
-          <label>Daily Auto-Growth (% per day)</label>
-          <input type="number" id="editGrowthInput" min="0" max="100" step="1" />
-        </div>
-        <div class="form-group">
-          <label>Personal Caption / Message</label>
-          <textarea id="editCaptionInput" rows="2" placeholder="Write something meaningful..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Sky & Heart Theme</label>
-          <select id="editThemeInput">
-            <option value="crimson">Crimson Rose (Romantic Pink/Red)</option>
-            <option value="aurora">Aurora Borealis (Cyan & Emerald)</option>
-            <option value="violet">Cosmic Violet (Deep Purple & Magenta)</option>
-            <option value="gold">Starlight Gold (Warm Amber & Gold)</option>
-            <option value="ocean">Midnight Sapphire (Deep Blue & Sky)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>GitHub Token (Saved only on this phone)</label>
-          <input type="password" id="editTokenInput" placeholder="github_pat_..." />
-        </div>
-        <div class="modal-actions">
-          <button class="btn-save" id="saveGitHubBtn">Save & Update Live</button>
-          <button class="btn-cancel" id="closeEditorBtn">Close</button>
-        </div>
-        <div class="sync-status" id="syncStatusText"></div>
-      </div>
-    </div>
-  </div>
-    <script>
-    // ==========================================
-    // REPOSITORY & ADMIN CONFIGURATION
-    // ==========================================
-    const GITHUB_OWNER = "ANAND2002-DEV";
-    const GITHUB_REPO  = "Trust-";
-    const DATA_PATH    = "data.json";
-    const ADMIN_SECRET = "anand123"; // Change if desired
-    // ==========================================
-
-    const THEME_PRESETS = {
-      crimson: {
-        primary: "#ff2a6d",
-        secondary: "#ff758f",
-        glow: "rgba(255, 42, 109, 0.65)",
-        nebula1: "rgba(255, 42, 109, 0.18)",
-        nebula2: "rgba(114, 9, 183, 0.22)",
-        top: "#040611",
-        mid: "#0b1026",
-        bottom: "#180c29"
-      },
-      aurora: {
-        primary: "#00f5d4",
-        secondary: "#00bbf9",
-        glow: "rgba(0, 245, 212, 0.58)",
-        nebula1: "rgba(0, 245, 212, 0.16)",
-        nebula2: "rgba(0, 187, 249, 0.20)",
-        top: "#030912",
-        mid: "#061826",
-        bottom: "#092635"
-      },
-      violet: {
-        primary: "#c77dff",
-        secondary: "#e0aaff",
-        glow: "rgba(199, 125, 255, 0.62)",
-        nebula1: "rgba(157, 78, 221, 0.20)",
-        nebula2: "rgba(60, 9, 108, 0.28)",
-        top: "#050311",
-        mid: "#100826",
-        bottom: "#210b3b"
-      },
-      gold: {
-        primary: "#ffb703",
-        secondary: "#ffd166",
-        glow: "rgba(255, 183, 3, 0.60)",
-        nebula1: "rgba(255, 183, 3, 0.16)",
-        nebula2: "rgba(251, 133, 0, 0.18)",
-        top: "#090703",
-        mid: "#171207",
-        bottom: "#291d08"
-      },
-      ocean: {
-        primary: "#38bdf8",
-        secondary: "#818cf8",
-        glow: "rgba(56, 189, 248, 0.60)",
-        nebula1: "rgba(56, 189, 248, 0.18)",
-        nebula2: "rgba(79, 70, 229, 0.22)",
-        top: "#030712",
-        mid: "#08142b",
-        bottom: "#0f2347"
-      }
-    };
-
-    const TRUST_TIERS = [
-      { min: 0,   label: "Spark of Trust",       sub: "Growing Stronger" },
-      { min: 50,  label: "Deepening Bond",       sub: "Heart Synced" },
-      { min: 100, label: "100% Full Heart",      sub: "Unbreakable" },
-      { min: 250, label: "Beyond Limits",        sub: "Overdrive Mode" },
-      { min: 500, label: "Cosmic Soulmates",     sub: "Infinite Orbit" },
-      { min: 800, label: "1000% Eternal Universe", sub: "Beyond the Stars" }
-    ];
-
-    let trustState = {
-      baseTrust: 100,
-      lastUpdated: new Date().toISOString(),
-      dailyGrowth: 5,
-      caption: "Every day with you builds something unbreakable.",
-      theme: "crimson"
-    };
-
-    function applyVisualTheme(themeKey) {
-      const t = THEME_PRESETS[themeKey] || THEME_PRESETS.crimson;
-      const root = document.documentElement.style;
-      root.setProperty("--primary", t.primary);
-      root.setProperty("--secondary", t.secondary);
-      root.setProperty("--glow", t.glow);
-      root.setProperty("--nebula-1", t.nebula1);
-      root.setProperty("--nebula-2", t.nebula2);
-      root.setProperty("--bg-top", t.top);
-      root.setProperty("--bg-mid", t.mid);
-      root.setProperty("--bg-bottom", t.bottom);
-    }
-
-    function computeCurrentTrust(state) {
-      const startMs = new Date(state.lastUpdated).getTime();
-      if (isNaN(startMs)) return Math.min(1000, Math.max(0, Number(state.baseTrust) || 0));
-      const elapsedDays = Math.max(0, (Date.now() - startMs) / (1000 * 60 * 60 * 24));
-      const calculated = Math.round((Number(state.baseTrust) || 0) + elapsedDays * (Number(state.dailyGrowth) || 0));
-      return Math.min(1000, Math.max(0, calculated));
-    }
-
-    function getTierForTrust(val) {
-      let chosen = TRUST_TIERS[0];
-      for (const tier of TRUST_TIERS) {
-        if (val >= tier.min) chosen = tier;
-      }
-      return chosen;
-    }
-
-    function updateDashboardUI() {
-      const livePercent = computeCurrentTrust(trustState);
-      const tier = getTierForTrust(livePercent);
-
-      document.getElementById("trustPercentText").textContent = livePercent + "%";
-      document.getElementById("trustSubLabel").textContent = tier.sub;
-      document.getElementById("milestoneCaption").textContent = trustState.caption;
-      document.getElementById("tierBadgeText").textContent = tier.label;
-
-      applyVisualTheme(trustState.theme);
-
-      // Liquid fills from bottom (y=175) to top (y=8) up to 100%, stays full with overdrive heartbeat above 100%
-      const fillFraction = Math.min(1, livePercent / 100);
-      const targetY = 176 - (168 * fillFraction);
-      document.getElementById("liquidLevelGroup").setAttribute("transform", `translate(0, ${targetY})`);
-
-      const stage = document.getElementById("heartStage");
-      if (livePercent >= 100) stage.classList.add("overdrive");
-      else stage.classList.remove("overdrive");
-    }
-            async function fetchStateFromGitHub() {
-      const badge = document.getElementById("liveSyncBadge");
-      try {
-        const url = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${DATA_PATH}?nocache=${Date.now()}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Waiting for data.json");
-        const remoteData = await response.json();
-        trustState = { ...trustState, ...remoteData };
-        badge.textContent = "Synced With Universe";
-      } catch (err) {
-        badge.textContent = "Local Preview Mode";
-      }
-      updateDashboardUI();
-    }
-
-    async function pushStateToGitHub() {
-      const token = document.getElementById("editTokenInput").value.trim();
-      const statusLabel = document.getElementById("syncStatusText");
-
-      if (!token) {
-        statusLabel.textContent = "Please paste your GitHub Token first.";
-        return;
-      }
-
-      localStorage.setItem("anand_trust_gh_pat", token);
-      statusLabel.textContent = "Committing changes to GitHub...";
-
-      const newTrustVal = Math.min(1000, Math.max(0, Number(document.getElementById("editTrustInput").value) || 0));
-      const newGrowthVal = Math.min(100, Math.max(0, Number(document.getElementById("editGrowthInput").value) || 0));
-      const newCaptionVal = document.getElementById("editCaptionInput").value.trim() || "Trust grows stronger every day.";
-      const newThemeVal = document.getElementById("editThemeInput").value;
-
-      const updatedData = {
-        baseTrust: newTrustVal,
-        lastUpdated: new Date().toISOString(),
-        dailyGrowth: newGrowthVal,
-        caption: newCaptionVal,
-        theme: newThemeVal
-      };
-
-      const endpoint = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_PATH}`;
-
-      try {
-        // Step 1: Fetch existing file SHA if data.json already exists
-        let existingSha = undefined;
-        const checkRes = await fetch(endpoint, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github+json"
-          }
+        function updatePointer(e) {
+            const touch = e.touches ? e.touches[0] : e;
+            pointer.x = touch.clientX;
+            pointer.y = touch.clientY;
+            pointer.active = true;
+        }
+        
+        canvas.addEventListener('mousemove', updatePointer);
+        canvas.addEventListener('touchstart', (e) => {
+            updatePointer(e);
+            shootingStars.push(new ShootingStar(pointer.x, pointer.y));
+        }, { passive: true });
+        canvas.addEventListener('touchmove', updatePointer, { passive: true });
+        canvas.addEventListener('mouseleave', () => { pointer.active = false; });
+        canvas.addEventListener('touchend', () => { pointer.active = false; });
+        canvas.addEventListener('click', (e) => {
+            shootingStars.push(new ShootingStar(e.clientX, e.clientY));
         });
 
-        if (checkRes.ok) {
-          const meta = await checkRes.json();
-          existingSha = meta.sha;
+        class ShootingStar {
+            constructor(targetX = null, targetY = null) {
+                const edge = Math.floor(Math.random() * 4);
+                const w = canvas.width;
+                const h = canvas.height;
+                let angle;
+
+                if (edge === 0) { this.x = Math.random() * w; this.y = -30; angle = (Math.random() * 110 + 35) * (Math.PI / 180); }
+                else if (edge === 1) { this.x = w + 30; this.y = Math.random() * h; angle = (Math.random() * 110 + 125) * (Math.PI / 180); }
+                else if (edge === 2) { this.x = Math.random() * w; this.y = h + 30; angle = (Math.random() * 110 + 215) * (Math.PI / 180); }
+                else { this.x = -30; this.y = Math.random() * h; angle = (Math.random() * 110 - 55) * (Math.PI / 180); }
+
+                if (targetX !== null && targetY !== null) {
+                    angle = Math.atan2(targetY - this.y, targetX - this.x);
+                }
+
+                this.speed = Math.random() * 9 + 7;
+                this.vx = Math.cos(angle) * this.speed;
+                this.vy = Math.sin(angle) * this.speed;
+                this.length = Math.random() * 110 + 75;
+                this.size = Math.random() * 1.6 + 1.2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                const m = 180;
+                return !(this.x < -m || this.x > canvas.width + m || this.y < -m || this.y > canvas.height + m);
+            }
+
+            draw() {
+                const tailX = this.x - (this.vx / this.speed) * this.length;
+                const tailY = this.y - (this.vy / this.speed) * this.length;
+                const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                grad.addColorStop(0.35, 'rgba(233, 213, 255, 0.5)');
+                grad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(tailX, tailY);
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = this.size;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 1.4, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = '#ffffff';
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+                  setInterval(() => {
+            if (shootingStars.length < 5) shootingStars.push(new ShootingStar());
+        }, 1200);
+
+        function animateSky() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const nearStars = [];
+            for (const s of bgStars) {
+                s.phase += s.speed;
+                const alpha = 0.25 + 0.7 * (0.5 + 0.5 * Math.sin(s.phase));
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.fill();
+
+                if (pointer.active) {
+                    const dist = Math.hypot(s.x - pointer.x, s.y - pointer.y);
+                    if (dist < 130) nearStars.push({ star: s, dist });
+                }
+            }
+
+            if (pointer.active && nearStars.length > 0) {
+                for (let i = 0; i < nearStars.length; i++) {
+                    const a = nearStars[i];
+                    ctx.beginPath();
+                    ctx.moveTo(pointer.x, pointer.y);
+                    ctx.lineTo(a.star.x, a.star.y);
+                    ctx.strokeStyle = `rgba(233, 213, 255, ${(1 - a.dist / 130) * 0.45})`;
+                    ctx.lineWidth = 0.9;
+                    ctx.stroke();
+
+                    for (let j = i + 1; j < nearStars.length; j++) {
+                        const b = nearStars[j];
+                        const pairDist = Math.hypot(a.star.x - b.star.x, a.star.y - b.star.y);
+                        if (pairDist < 110) {
+                            ctx.beginPath();
+                            ctx.moveTo(a.star.x, a.star.y);
+                            ctx.lineTo(b.star.x, b.star.y);
+                            ctx.strokeStyle = `rgba(216, 180, 254, ${(1 - pairDist / 110) * 0.55})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            shootingStars = shootingStars.filter(star => {
+                const alive = star.update();
+                if (alive) star.draw();
+                return alive;
+            });
+
+            requestAnimationFrame(animateSky);
+        }
+        animateSky();
+
+        // 3. Romantic Piano & Chime Synthesizer (Harsh Space Pad Removed)
+        let audioCtx = null;
+        let isPlaying = false;
+        let masterGain = null;
+        let melodyTimer = null;
+        let noteStep = 0;
+
+        const TRACKS = {
+            clair: {
+                name: '🎹 Clair de Lune (Romantic Piano)',
+                tempo: 520,
+                type: 'piano',
+                notes: [
+                    [61, 65, 68], 77, 73, 68, 65, 68, 73, 77,
+                    [58, 61, 65], 73, 70, 65, 61, 65, 70, 73,
+                    [54, 61, 66], 73, 70, 66, 61, 66, 70, 73,
+                    [56, 63, 68], 75, 72, 68, 63, 68, 72, 75
+                ]
+            },
+            moonlight: {
+                name: '🎹 Moonlight Serenade (Emotional Piano)',
+                tempo: 580,
+                type: 'piano',
+                notes: [
+                    [49, 56], 61, 64, 68, 64, 68, 61, 64,
+                    [45, 52], 61, 64, 69, 64, 69, 61, 64,
+                    [40, 47], 59, 64, 68, 64, 68, 59, 64,
+                    [47, 54], 59, 63, 66, 63, 66, 59, 63
+                ]
+            },
+            musicbox: {
+                name: '✨ Starlight Music Box',
+                tempo: 460,
+                type: 'chime',
+                notes: [
+                    76, 83, 81, 79, 76, 79, 81, 83,
+                    74, 81, 79, 78, 74, 78, 79, 81,
+                    72, 79, 78, 76, 72, 76, 78, 79,
+                    71, 78, 76, 74, 71, 74, 76, 79
+                ]
+            }
+        };
+
+        const TRACK_KEYS = Object.keys(TRACKS);
+        let activeTrackKey = 'clair';
+
+        const musicBtn = document.getElementById('music-toggle');
+        const trackSwitchBtn = document.getElementById('track-switch');
+        const trackToast = document.getElementById('track-toast');
+        let toastTimeout = null;
+
+        function showTrackToast(text) {
+            trackToast.innerText = text;
+            trackToast.style.opacity = '1';
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { trackToast.style.opacity = '0'; }, 2600);
         }
 
-        // Step 2: Encode JSON safely in UTF-8 Base64 and PUT to GitHub
-        const jsonString = JSON.stringify(updatedData, null, 2);
-        const base64Payload = btoa(unescape(encodeURIComponent(jsonString)));
+        function midiToFreq(m) {
+            return 440 * Math.pow(2, (m - 69) / 12);
+        }
 
-        const writeRes = await fetch(endpoint, {
-          method: "PUT",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github+json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: "Update trust universe state",
-            content: base64Payload,
-            sha: existingSha
-          })
+        function playPianoNote(midi, style) {
+            if (!audioCtx || !isPlaying) return;
+            const now = audioCtx.currentTime;
+            const freq = midiToFreq(midi);
+
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const filter = audioCtx.createBiquadFilter();
+            const noteGain = audioCtx.createGain();
+
+            if (style === 'chime') {
+                osc1.type = 'sine';
+                osc2.type = 'sine';
+                osc2.frequency.value = freq * 2;
+                noteGain.gain.setValueAtTime(0.0001, now);
+                noteGain.gain.linearRampToValueAtTime(0.11, now + 0.015);
+                noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+            } else {
+                osc1.type = 'triangle';
+                osc2.type = 'sine';
+                osc2.frequency.value = freq * 2;
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1100, now);
+                filter.frequency.exponentialRampToValueAtTime(340, now + 2.4);
+
+                noteGain.gain.setValueAtTime(0.0001, now);
+                noteGain.gain.linearRampToValueAtTime(0.14, now + 0.035);
+                noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+            }
+
+            osc1.frequency.value = freq;
+
+            const subGain = audioCtx.createGain();
+            subGain.gain.value = 0.25;
+
+            osc1.connect(filter);
+            osc2.connect(subGain);
+            subGain.connect(filter);
+            filter.connect(noteGain);
+            noteGain.connect(masterGain);
+
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + 2.9);
+            osc2.stop(now + 2.9);
+        }
+
+        function stopCurrentEngine() {
+            clearInterval(melodyTimer);
+            melodyTimer = null;
+        }
+
+        function startTrackEngine(key) {
+            stopCurrentEngine();
+            const track = TRACKS[key] || TRACKS.clair;
+            noteStep = 0;
+
+            const triggerStep = () => {
+                if (!isPlaying) return;
+                const item = track.notes[noteStep % track.notes.length];
+                if (Array.isArray(item)) {
+                    item.forEach((n, i) => setTimeout(() => playPianoNote(n, track.type), i * 45));
+                } else {
+                    playPianoNote(item, track.type);
+                }
+                noteStep++;
+            };
+            triggerStep();
+            melodyTimer = setInterval(triggerStep, track.tempo);
+                  }
+                  function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                masterGain = audioCtx.createGain();
+                masterGain.gain.value = 0.001;
+                masterGain.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function toggleSpaceMusic() {
+            initAudioContext();
+            isPlaying = !isPlaying;
+            const now = audioCtx.currentTime;
+
+            if (isPlaying) {
+                startTrackEngine(activeTrackKey);
+                masterGain.gain.cancelScheduledValues(now);
+                masterGain.gain.exponentialRampToValueAtTime(0.65, now + 0.8);
+                musicBtn.innerText = '🔊';
+                showTrackToast(TRACKS[activeTrackKey].name);
+            } else {
+                masterGain.gain.cancelScheduledValues(now);
+                masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+                setTimeout(() => { if (!isPlaying) stopCurrentEngine(); }, 550);
+                musicBtn.innerText = '🔇';
+            }
+        }
+
+        function cycleNextTrack() {
+            const nextIdx = (TRACK_KEYS.indexOf(activeTrackKey) + 1) % TRACK_KEYS.length;
+            activeTrackKey = TRACK_KEYS[nextIdx];
+            initAudioContext();
+
+            if (!isPlaying) {
+                isPlaying = true;
+                musicBtn.innerText = '🔊';
+                const now = audioCtx.currentTime;
+                masterGain.gain.cancelScheduledValues(now);
+                masterGain.gain.exponentialRampToValueAtTime(0.65, now + 0.6);
+            }
+            startTrackEngine(activeTrackKey);
+            showTrackToast(TRACKS[activeTrackKey].name);
+        }
+
+        musicBtn.addEventListener('click', toggleSpaceMusic);
+        trackSwitchBtn.addEventListener('click', cycleNextTrack);
+
+        // 4. Trust Meter, Milestones & Live Day Streak Logic
+        const MAX_TRUST = 1000;
+        const DAILY_GROWTH = 5;
+        let currentState = {
+            basePercent: 50,
+            baseDate: getTodayMidnight(),
+            baseDay: 1,
+            theme: 'violet',
+            defaultTrack: 'clair',
+            topCaption: 'Among The Galaxies',
+            bottomCaption: 'I Found You',
+            streakCaption: 'Day {day} of growing together'
+        };
+
+        function getTodayMidnight() {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        }
+
+        function getMilestoneLabel(val) {
+            if (val >= 1000) return '✦ Infinite Universe (1000%)';
+            if (val >= 750) return '✦ Supernova Bond (750%+)';
+            if (val >= 500) return '✦ Eternal Constellation (500%+)';
+            if (val >= 250) return '✦ Celestial Orbit (250%+)';
+            if (val >= 100) return '✦ Rising Starlight (100%+)';
+            return '✦ Cosmic Spark';
+        }
+
+        function renderAll() {
+            const baseDateVal = Number(currentState.baseDate) || getTodayMidnight();
+            const basePctVal = currentState.basePercent !== undefined ? Number(currentState.basePercent) : 50;
+            const daysPassed = Math.max(0, Math.floor((getTodayMidnight() - baseDateVal) / 86400000));
+            const liveTrust = Math.min(MAX_TRUST, Math.max(0, basePctVal + daysPassed * DAILY_GROWTH));
+            const liveDay = Math.max(1, Number(currentState.baseDay || 1) + daysPassed);
+
+            document.getElementById('trust-value').innerText = liveTrust;
+            const ratio = Math.min(1, Math.max(0, liveTrust / MAX_TRUST));
+            const yPosition = 165 - (ratio * 160);
+            document.getElementById('water-level').setAttribute('transform', `translate(0, ${yPosition})`);
+
+            document.getElementById('ui-top-caption').innerText = currentState.topCaption || 'Among The Galaxies';
+            document.getElementById('ui-bottom-caption').innerText = currentState.bottomCaption || 'I Found You';
+            document.getElementById('ui-milestone').innerText = getMilestoneLabel(liveTrust);
+
+            const streakTemplate = currentState.streakCaption || 'Day {day} of growing together';
+            document.getElementById('ui-streak').innerText = streakTemplate.replace('{day}', liveDay);
+
+            if (currentState.defaultTrack && TRACKS[currentState.defaultTrack]) {
+                activeTrackKey = currentState.defaultTrack;
+            }
+            applyTheme(currentState.theme || 'violet');
+        }
+
+        async function loadGlobalTrustData() {
+            try {
+                const url = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${DATA_FILE}?t=${Date.now()}`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.basePercent !== undefined) {
+                        currentState = { ...currentState, ...data };
+                    }
+                }
+            } catch (error) {
+                console.warn("Using fallback state:", error);
+            }
+            renderAll();
+        }
+
+        // 5. Admin Modal Controls
+        const modal = document.getElementById('admin-modal');
+        const loginView = document.getElementById('login-view');
+        const editView = document.getElementById('edit-view');
+        const loginError = document.getElementById('login-error');
+
+        document.getElementById('admin-trigger').addEventListener('click', () => {
+            loginError.style.display = 'none';
+            document.getElementById('admin-user').value = '';
+            document.getElementById('admin-pass').value = '';
+            document.getElementById('sync-note').innerText = '';
+            loginView.style.display = 'block';
+            editView.style.display = 'none';
+            modal.style.display = 'flex';
         });
 
-        if (!writeRes.ok) {
-          const errBody = await writeRes.json().catch(() => ({}));
-          throw new Error(errBody.message || "GitHub rejected the update. Check token Contents permission.");
+        function closeModal() { modal.style.display = 'none'; }
+
+        function verifyLogin() {
+            const user = document.getElementById('admin-user').value.trim();
+            const pass = document.getElementById('admin-pass').value;
+
+            if (user === 'anand' && pass === '@anand2002') {
+                loginView.style.display = 'none';
+                editView.style.display = 'block';
+
+                const baseDateVal = Number(currentState.baseDate) || getTodayMidnight();
+                const daysPassed = Math.max(0, Math.floor((getTodayMidnight() - baseDateVal) / 86400000));
+                document.getElementById('new-percentage').value = document.getElementById('trust-value').innerText;
+                document.getElementById('theme-select').value = currentState.theme || 'violet';
+                document.getElementById('music-select').value = TRACKS[currentState.defaultTrack] ? currentState.defaultTrack : 'clair';
+                document.getElementById('edit-top-caption').value = currentState.topCaption || 'Among The Galaxies';
+                document.getElementById('edit-bottom-caption').value = currentState.bottomCaption || 'I Found You';
+                document.getElementById('edit-day-number').value = Number(currentState.baseDay || 1) + daysPassed;
+                document.getElementById('edit-streak-caption').value = currentState.streakCaption || 'Day {day} of growing together';
+                document.getElementById('github-token-input').value = localStorage.getItem('gh_trust_pat') || '';
+            } else {
+                loginError.style.display = 'block';
+            }
         }
 
-        trustState = updatedData;
-        updateDashboardUI();
-        statusLabel.textContent = "Saved! Live for everyone in ~30 seconds.";
-      } catch (error) {
-        statusLabel.textContent = "Error: " + error.message;
-      }
-    }
+        async function saveAdminSettings() {
+            const inputVal = parseFloat(document.getElementById('new-percentage').value);
+            const dayVal = parseInt(document.getElementById('edit-day-number').value, 10);
+            const token = document.getElementById('github-token-input').value.trim();
+            const syncNote = document.getElementById('sync-note');
 
-    // Modal & Admin Event Wiring
-    const adminModal = document.getElementById("adminModal");
-    const openAdminBtn = document.getElementById("openAdminBtn");
-    const closeAdminBtn = document.getElementById("closeAdminBtn");
-    const cancelLoginBtn = document.getElementById("cancelLoginBtn");
-    const closeEditorBtn = document.getElementById("closeEditorBtn");
+            if (isNaN(inputVal) || inputVal < 0 || inputVal > MAX_TRUST) {
+                alert('Please enter a valid percentage between 0 and 1000.');
+                return;
+            }
 
-    function closeAdminModal() {
-      adminModal.classList.remove("open");
-      document.getElementById("syncStatusText").textContent = "";
-    }
+            if (!token) {
+                syncNote.innerText = 'Please paste your GitHub Token first.';
+                return;
+            }
 
-    openAdminBtn.onclick = () => {
-      adminModal.classList.add("open");
-      document.getElementById("editTokenInput").value = localStorage.getItem("anand_trust_gh_pat") || "";
-    };
+            localStorage.setItem('gh_trust_pat', token);
 
-    closeAdminBtn.onclick = closeAdminModal;
-    cancelLoginBtn.onclick = closeAdminModal;
-    closeEditorBtn.onclick = closeAdminModal;
+            currentState = {
+                basePercent: inputVal,
+                baseDate: getTodayMidnight(),
+                baseDay: isNaN(dayVal) || dayVal < 1 ? 1 : dayVal,
+                theme: document.getElementById('theme-select').value,
+                defaultTrack: document.getElementById('music-select').value,
+                topCaption: document.getElementById('edit-top-caption').value.trim() || 'Among The Galaxies',
+                bottomCaption: document.getElementById('edit-bottom-caption').value.trim() || 'I Found You',
+                streakCaption: document.getElementById('edit-streak-caption').value.trim() || 'Day {day} of growing together'
+            };
 
-    document.getElementById("unlockAdminBtn").onclick = () => {
-      const entered = document.getElementById("adminPassField").value;
-      if (entered === ADMIN_SECRET) {
-        document.getElementById("adminLoginBox").style.display = "none";
-        document.getElementById("adminEditorBox").style.display = "block";
-        document.getElementById("editTrustInput").value = computeCurrentTrust(trustState);
-        document.getElementById("editGrowthInput").value = trustState.dailyGrowth;
-        document.getElementById("editCaptionInput").value = trustState.caption;
-        document.getElementById("editThemeInput").value = trustState.theme;
-      } else {
-        alert("Incorrect admin password.");
-      }
-    };
+            if (isPlaying) {
+                startTrackEngine(currentState.defaultTrack);
+                showTrackToast(TRACKS[currentState.defaultTrack].name);
+            }
 
-    document.getElementById("saveGitHubBtn").onclick = pushStateToGitHub;
-            // Interactive Heart Tap Particles
-    document.getElementById("heartStage").addEventListener("click", (e) => {
-      const symbols = ["❤", "✨", "💖", "⭐", "💫"];
-      for (let i = 0; i < 7; i++) {
-        const el = document.createElement("span");
-        el.className = "tap-particle";
-        el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-        el.style.left = e.clientX + "px";
-        el.style.top = e.clientY + "px";
-        const angle = (Math.PI * 2 * i) / 7 + (Math.random() * 0.5);
-        const dist = 55 + Math.random() * 55;
-        el.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
-        el.style.setProperty("--dy", `${Math.sin(angle) * dist - 40}px`);
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 1200);
-      }
-    });
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.innerText = 'Saving...';
+            saveBtn.disabled = true;
+            syncNote.innerText = 'Syncing with GitHub...';
 
-    // Ambient Music Player with Track Switcher
-    const PLAYLIST = [
-      {
-        title: "Midnight Stargazing (Ambient Piano)",
-        url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3"
-      },
-      {
-        title: "Celestial Drift (Calm Space)",
-        url: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3"
-      },
-      {
-        title: "Moonlit Promise (Soft Melody)",
-        url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3"
-      }
-    ];
+            const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE}`;
 
-    let currentTrack = 0;
-    const bgAudio = new Audio(PLAYLIST[0].url);
-    bgAudio.loop = true;
+            try {
+                let sha = undefined;
+                const getRes = await fetch(apiUrl, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+                });
+                if (getRes.ok) {
+                    sha = (await getRes.json()).sha;
+                }
 
-    const playPauseBtn = document.getElementById("playPauseBtn");
-    const eqBars = document.getElementById("eqBars");
-    const trackTitleDisplay = document.getElementById("trackTitleDisplay");
+                const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentState, null, 2))));
+                const putRes = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Update trust meter settings',
+                        content: contentBase64,
+                        sha: sha
+                    })
+                });
 
-    function loadTrack(index, autoPlay) {
-      currentTrack = (index + PLAYLIST.length) % PLAYLIST.length;
-      bgAudio.src = PLAYLIST[currentTrack].url;
-      trackTitleDisplay.textContent = PLAYLIST[currentTrack].title;
-      if (autoPlay) {
-        bgAudio.play().catch(() => {});
-        playPauseBtn.textContent = "⏸";
-        eqBars.classList.add("playing");
-      }
-    }
+                if (!putRes.ok) throw new Error('GitHub rejected update. Check token Contents permission.');
 
-    playPauseBtn.onclick = () => {
-      if (bgAudio.paused) {
-        bgAudio.play().catch(() => {});
-        playPauseBtn.textContent = "⏸";
-        eqBars.classList.add("playing");
-      } else {
-        bgAudio.pause();
-        playPauseBtn.textContent = "▶";
-        eqBars.classList.remove("playing");
-      }
-    };
-
-    document.getElementById("nextTrackBtn").onclick = () => loadTrack(currentTrack + 1, !bgAudio.paused);
-    document.getElementById("prevTrackBtn").onclick = () => loadTrack(currentTrack - 1, !bgAudio.paused);
-
-    // Starry Sky & Multi-Directional Shooting Stars
-    const canvas = document.getElementById("starfield");
-    const ctx = canvas.getContext("2d");
-    let width = 0, height = 0;
-    let starParticles = [];
-    let shootingStars = [];
-
-    function initCanvas() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      const starCount = Math.min(200, Math.floor((width * height) / 5500));
-      starParticles = Array.from({ length: starCount }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        radius: Math.random() * 1.6 + 0.3,
-        alpha: Math.random(),
-        speed: 0.005 + Math.random() * 0.018,
-        tint: Math.random() > 0.8 ? "#ffd166" : "#ffffff"
-      }));
-    }
-
-    window.addEventListener("resize", initCanvas);
-    initCanvas();
-
-    function createShootingStar() {
-      const direction = Math.random() > 0.5 ? 1 : -1;
-      shootingStars.push({
-        x: direction === 1 ? Math.random() * (width * 0.45) : width * (0.55 + Math.random() * 0.45),
-        y: Math.random() * (height * 0.35),
-        vx: direction * (7 + Math.random() * 5),
-        vy: 3.5 + Math.random() * 4,
-        len: 75 + Math.random() * 55,
-        life: 1.0
-      });
-    }
-
-    setInterval(() => {
-      if (document.visibilityState === "visible") createShootingStar();
-    }, 2800);
-
-    function renderStarfield() {
-      ctx.clearRect(0, 0, width, height);
-
-      for (const s of starParticles) {
-        s.alpha += s.speed;
-        if (s.alpha >= 1 || s.alpha <= 0.12) s.speed *= -1;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-        ctx.fillStyle = s.tint;
-        ctx.globalAlpha = Math.max(0.1, Math.min(1, s.alpha));
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-
-      for (let i = shootingStars.length - 1; i >= 0; i--) {
-        const st = shootingStars[i];
-        st.x += st.vx;
-        st.y += st.vy;
-        st.life -= 0.022;
-
-        if (st.life <= 0) {
-          shootingStars.splice(i, 1);
-          continue;
+                renderAll();
+                syncNote.innerText = 'Saved! Live for everyone in ~30 seconds.';
+                setTimeout(closeModal, 1200);
+            } catch (err) {
+                syncNote.innerText = 'Error: ' + err.message;
+            } finally {
+                saveBtn.innerText = 'Save All';
+                saveBtn.disabled = false;
+            }
         }
 
-        const tailX = st.x - st.vx * 5;
-        const tailY = st.y - st.vy * 5;
-        const grad = ctx.createLinearGradient(st.x, st.y, tailX, tailY);
-        grad.addColorStop(0, `rgba(255, 255, 255, ${st.life})`);
-        grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+        document.getElementById('admin-pass').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyLogin();
+        });
 
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2.2;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(st.x, st.y);
-        ctx.lineTo(tailX, tailY);
-        ctx.stroke();
-      }
-
-      requestAnimationFrame(renderStarfield);
-    }
-
-    renderStarfield();
-    fetchStateFromGitHub();
-    // Auto-poll GitHub every 45 seconds so the other person sees changes seamlessly
-    setInterval(fetchStateFromGitHub, 45000);
-  </script>
+        loadGlobalTrustData();
+        setInterval(loadGlobalTrustData, 45000);
+    </script>
 </body>
 </html>
