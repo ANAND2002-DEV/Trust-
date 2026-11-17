@@ -485,6 +485,10 @@
 
             <label class="field-label">Bottom Caption</label>
             <input type="text" id="edit-bottom-caption" placeholder="I Found You">
+        
+            <label class="field-label">Milestone Badge Text (Leave blank for auto)</label>
+            <input type="text" id="edit-milestone-caption" placeholder="✦ ETERNAL US ✦">
+            
 
             <label class="field-label">Current Day Number (Auto +1 daily)</label>
             <input type="number" id="edit-day-number" min="1" step="1">
@@ -905,6 +909,7 @@
             defaultTrack: 'clair',
             topCaption: 'Among The Galaxies',
             bottomCaption: 'I Found You',
+            milestoneCaption: '',
             streakCaption: 'Day {day} of growing together'
         };
 
@@ -933,11 +938,10 @@
             const ratio = Math.min(1, Math.max(0, liveTrust / MAX_TRUST));
             const yPosition = 165 - (ratio * 160);
             document.getElementById('water-level').setAttribute('transform', `translate(0, ${yPosition})`);
-
             document.getElementById('ui-top-caption').innerText = currentState.topCaption || 'Among The Galaxies';
             document.getElementById('ui-bottom-caption').innerText = currentState.bottomCaption || 'I Found You';
-            document.getElementById('ui-milestone').innerText = getMilestoneLabel(liveTrust);
-
+            document.getElementById('ui-milestone').innerText = currentState.milestoneCaption ? currentState.milestoneCaption : getMilestoneLabel(liveTrust);
+            
             const streakTemplate = currentState.streakCaption || 'Day {day} of growing together';
             document.getElementById('ui-streak').innerText = streakTemplate.replace('{day}', liveDay);
 
@@ -996,6 +1000,7 @@
                 document.getElementById('music-select').value = TRACKS[currentState.defaultTrack] ? currentState.defaultTrack : 'clair';
                 document.getElementById('edit-top-caption').value = currentState.topCaption || 'Among The Galaxies';
                 document.getElementById('edit-bottom-caption').value = currentState.bottomCaption || 'I Found You';
+                document.getElementById('edit-milestone-caption').value = currentState.milestoneCaption || '';
                 document.getElementById('edit-day-number').value = Number(currentState.baseDay || 1) + daysPassed;
                 document.getElementById('edit-streak-caption').value = currentState.streakCaption || 'Day {day} of growing together';
                 document.getElementById('github-token-input').value = localStorage.getItem('gh_trust_pat') || '';
@@ -1029,6 +1034,7 @@
                 theme: document.getElementById('theme-select').value,
                 defaultTrack: document.getElementById('music-select').value,
                 topCaption: document.getElementById('edit-top-caption').value.trim() || 'Among The Galaxies',
+                milestoneCaption: document.getElementById('edit-milestone-caption').value.trim(),
                 bottomCaption: document.getElementById('edit-bottom-caption').value.trim() || 'I Found You',
                 streakCaption: document.getElementById('edit-streak-caption').value.trim() || 'Day {day} of growing together'
             };
