@@ -1,7 +1,10 @@
 {
-  "baseTrust": 50,
-  "lastUpdated": "2026-11-17T15:43:30.453Z",
-  "dailyGrowth": 5,
-  "caption": "Every day with you builds something unbreakable.",
-  "theme": "crimson"
+  "basePercent": 50,
+  "baseDate": 1794853800000,
+  "baseDay": 1,
+  "theme": "violet",
+  "defaultTrack": "clair",
+  "topCaption": "Among The Galaxies",
+  "bottomCaption": "I Found You",
+  "streakCaption": "Day {416} of growing together"
 }
